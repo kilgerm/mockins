@@ -24,5 +24,6 @@ MyClass instructed = Mockins.instruct(classUnderTest);
 // then call whatever method you would like to test...
 instructed.testMethod(null);
 
-// ...this will run testMethod and try to add mocks/stubs for parameters and fields so that the method does not throw a NPE!
+// ...this will run testMethod and try to add mocks/stubs 
+// for parameters and fields so that the method does not throw a NPE!
 ```
