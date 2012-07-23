@@ -1,0 +1,8 @@
+TODOs
+------
+
+Up-to-date TODOs are listed here.
+
+* log4j logging
+* better stubbable method detections
+* intelligent value provider for lists
