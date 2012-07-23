@@ -1,4 +1,8 @@
 Mockins
+========
+source-highlighter:highlight
+
+Mockins
 --------
 
 Mockins is a mock instructor. It's purpose is to help you dealing with mocking in unit tests.
@@ -14,10 +18,15 @@ Mockins is a mock instructor. It's purpose is to help you dealing with mocking i
   
 .Example
 [source,java]
+---------------------------------------------------------------------
 // This is the class you would like to test
 MyClass classUnderTest = new MyClass();
-// first, create a "instructed"
-instructed = Mockins.instruct(classUnderTest);
+
+// first, create an "instructed" wrapper
+MyClass instructed = Mockins.instruct(classUnderTest);
+
 // then call whatever method you would like to test...
-classUnderTest.testMethod(null);
+instructed.testMethod(null);
+
 // ...this will run testMethod and try to add mocks/stubs for parameters and fields so that the method does not throw a NPE!
+---------------------------------------------------------------------
