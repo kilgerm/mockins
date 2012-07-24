@@ -1,4 +1,4 @@
-package demo;
+package net.kilger.mockins.sample1;
 
 public class InfoSource {
 
