@@ -80,7 +80,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
-			<scope>compile</scope><!-- FIXME: provided? -->
+			<scope>test</scope>
 		</dependency>
 		
 		<!-- direct dependencies of mockins -->
