@@ -10,13 +10,20 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
     
-    <url>https://github.com/kilgerm/mockins</url>
     <name>Mockins</name>
+    <url>https://github.com/kilgerm/mockins</url>
     
     <scm>
         <developerConnection>git@github.com:kilgerm/mockins.git</developerConnection>
         <connection>git://github.com/kilgerm/mockins.git</connection>
     </scm>
+    
+    <licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+    </licenses>
 
 	<build>
 		<plugins>
@@ -75,14 +82,6 @@
 			<scope>provided</scope>
         </dependency>
         
-        <!-- junit -->        
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.10</version>
-			<scope>test</scope>
-		</dependency>
-		
 		<!-- direct dependencies of mockins -->
 		<dependency>
 			<groupId>cglib</groupId>
@@ -102,6 +101,14 @@
 			<version>2.3</version>
 			<scope>compile</scope>
 		</dependency>
+
+        <!-- junit for tests of Mockins -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 	
 </project>
