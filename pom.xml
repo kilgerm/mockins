@@ -61,18 +61,29 @@
 	</build>
 
 	<dependencies>
+		<!-- mocking frameworks -->
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
 			<version>3.1</version>
-			<scope>compile</scope><!-- FIXME: provided? -->
+			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.9.0</version>
+			<scope>provided</scope>
+        </dependency>
+        
+        <!-- junit -->        
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>compile</scope><!-- FIXME: provided? -->
 		</dependency>
+		
+		<!-- direct dependencies of mockins -->
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
@@ -90,11 +101,6 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.3</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.9.0</version>
 		</dependency>
 	</dependencies>
 	

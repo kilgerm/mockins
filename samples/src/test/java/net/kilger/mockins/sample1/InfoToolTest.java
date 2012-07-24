@@ -16,10 +16,12 @@ public class InfoToolTest {
         // this just yielded an NPE...
         //   classUnderTest.something(param0, new Object());
         
-        // so we now use the instructed object and wait for the output
+        // so we now use the instructed object
         InfoTool instructed = Mockins.instruct(classUnderTest);
+        
+        // this still throws an NPE, but also generates and prints
+        // the mock code to get rid of it...
         instructed.something(null, new Object());
-        // this still throws an NPE, but also generates the mock code to avoid it!
     }
     
 }
