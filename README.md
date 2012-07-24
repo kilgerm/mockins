@@ -38,3 +38,15 @@ classUnderTest.field1 = EasyMock.createMock(B.class);
 EasyMock.replay(classUnderTest.field1);
 ```
 
+## Mocking Frameworks
+
+Mockins supports the following mocking frameworks:
+* EasyMock <http://easymock.org/>
+* Mockito <http://mockito.googlecode.com>
+
+TODO: version supported
+
+## Requirements
+
+* You need a Java 6 JDK (no Java 5 support yet)
+* and one of the supported mocking frameworks on your (test) classpath
