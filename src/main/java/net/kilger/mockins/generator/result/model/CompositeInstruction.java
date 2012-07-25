@@ -7,7 +7,6 @@ public class CompositeInstruction implements Instruction {
 
     protected final List<Instruction> components = new ArrayList<Instruction>();
     
-    @Override
     public String message() {
         StringBuilder message = new StringBuilder();
         

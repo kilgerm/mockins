@@ -19,17 +19,14 @@ public class EmptyArrayValueProvider implements ValueProvider<Object> {
         this.clazz = clazz;
     }
     
-    @Override
     public Object createValue() {
         return Array.newInstance(clazz, 0);
     }
 
-    @Override
     public String code() {
         return "new " + classNamer.classLiteral(clazz) + "[0]";
     }
 
-    @Override
     public boolean isMocking() {
         return false;
     }

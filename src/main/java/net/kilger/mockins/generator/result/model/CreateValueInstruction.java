@@ -11,7 +11,6 @@ public class CreateValueInstruction implements Instruction {
         this.valueCreationCode = valueCreationCode;
     }
 
-    @Override
     public String message() {
         return targetName + " = " + valueCreationCode + ";\n";
     }

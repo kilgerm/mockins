@@ -18,7 +18,6 @@ public abstract class BaseMockHelper implements MockHelper {
         return method.invoke(mock, args);
     }
 
-    @Override
     public void addStub(Object mock, Stubbing stubbing) throws IllegalAccessException, InvocationTargetException {
         if (!stubbing.isEmpty()) {
             Object[] methodArgMatchers = argMatcherAnyForAll(stubbing.getMethodParamTypes());
@@ -32,7 +31,7 @@ public abstract class BaseMockHelper implements MockHelper {
              * for a working test with mocks anyway.
              */
             stubbing.getMethod().setAccessible(true);
-            
+
             stubMethod(mock, stubbing.getMethod(), stubbing.createValue(), methodArgMatchers);
         }
     }

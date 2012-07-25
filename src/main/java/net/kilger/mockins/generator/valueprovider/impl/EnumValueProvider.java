@@ -16,17 +16,14 @@ public class EnumValueProvider implements ValueProvider<Object> {
         this.defaultValue = clazz.getEnumConstants()[0];
     }
 
-    @Override
     public Object createValue() {
         return defaultValue;
     }
 
-    @Override
     public String code() {
         return classNamer.className(clazz) + "." + defaultValue;
     }
 
-    @Override
     public boolean isMocking() {
         return false;
     }

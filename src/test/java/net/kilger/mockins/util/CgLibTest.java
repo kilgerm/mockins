@@ -23,7 +23,6 @@ public class CgLibTest {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(A.class);
         Callback callback = new MethodInterceptor() {
-            @Override
             public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 //                System.out.println(">> intercept: " + method + "," + args + "," + proxy);
                 Object result = proxy.invokeSuper(obj, args);

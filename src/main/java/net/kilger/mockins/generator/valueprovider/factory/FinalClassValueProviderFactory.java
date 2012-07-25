@@ -9,7 +9,6 @@ import net.kilger.mockins.generator.valueprovider.impl.NewInstanceValueProvider;
 public class FinalClassValueProviderFactory implements ValueProviderFactory {
 
     @SuppressWarnings("unchecked")
-    @Override
     public <T> ValueProvider<T> valueProvider(Class<T> clazz) {
         try {
             return (ValueProvider<T>) new NewInstanceValueProvider(clazz);
@@ -21,12 +20,10 @@ public class FinalClassValueProviderFactory implements ValueProviderFactory {
         }
     }
 
-    @Override
     public boolean specificFor(Class<?> clazz) {
         return false;
     }
 
-    @Override
     public boolean canHandle(Class<?> clazz) {
         return Modifier.isFinal(clazz.getModifiers()) && (!clazz.isArray());
     }

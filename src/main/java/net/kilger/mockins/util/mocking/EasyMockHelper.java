@@ -16,12 +16,10 @@ public class EasyMockHelper extends BaseMockHelper {
         EasyMock.expectLastCall().andReturn(value).anyTimes();
     } 
 
-    @Override
     public <T> T createMock(Class<T> clazz) {
         return EasyMock.createNiceMock(clazz);
     }
 
-    @Override
     public boolean isMock(Object o) {
         // heuristically check toString()...
         return o.toString().startsWith("EasyMock for");
@@ -59,22 +57,18 @@ public class EasyMockHelper extends BaseMockHelper {
         return EasyMock.anyObject(clazz);
     }
 
-    @Override
     public void prepareMock(Object mock) {
         EasyMock.replay(mock);
     }
 
-    @Override
     public Object prepareMockCode(String targetName) {
         return "EasyMock.replay("+ targetName + ")";
     }
 
-    @Override
     public void reset(Object mock) {
         EasyMock.reset(mock);
     }
 
-    @Override
     public String argMatcherAnyCode(Class<?> clazz) {
         if (clazz.equals(Boolean.TYPE)) {
             return "EasyMock.anyBoolean()";
@@ -106,14 +100,12 @@ public class EasyMockHelper extends BaseMockHelper {
         return "EasyMock.anyObject(" + classLiteral(clazz) + ")";
     }
 
-    @Override
     public String createMockCode(Class<?> clazz) {
         return "EasyMock.createMock(" + classLiteral(clazz) + ")";
     }
 
     // FIXME: Test
 
-    @Override
     public String addStubCode(String mockName, Stubbing stubbing) {
         StringBuilder stubStatement = new StringBuilder();
 

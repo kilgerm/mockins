@@ -23,7 +23,6 @@ public class NewInstanceValueProvider implements ValueProvider<Object> {
         createNewInstance();
     }
 
-    @Override
     public Object createValue() {
         try {
             return createNewInstance();
@@ -39,12 +38,10 @@ public class NewInstanceValueProvider implements ValueProvider<Object> {
         return clazz.newInstance();
     }
 
-    @Override
     public String code() {
         return "new " + classNamer.className(clazz) + "()";
     }
 
-    @Override
     public boolean isMocking() {
         return false;
     }

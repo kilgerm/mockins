@@ -79,7 +79,7 @@ public class MockitoHelperTest {
         
         classUnderTest.stubMethod(mock, method, INT_VALUE, new Object[] { Mockito.anyInt() });
         
-        assertEquals((Integer) INT_VALUE, (Integer) mock.intMethodWithOneArg(1));
+        assertEquals(INT_VALUE, (Integer) mock.intMethodWithOneArg(1));
     }
     
     private static interface A {
@@ -104,29 +104,23 @@ public class MockitoHelperTest {
         A mock = Mockito.mock(A.class);
         A real = new A() {
 
-            @Override
             public void voidMethod() {
             }
 
-            @Override
             public void voidMethodWithOneArg(String p1) {
             }
 
-            @Override
             public void voidMethodWithTwoArgs(String p1, int p2) {
             }
 
-            @Override
             public String stringMethod() {
                 return null;
             }
             
-            @Override
             public String stringMethodWithOneArg(Object p1) {
                 return null;
             }
 
-            @Override
             public int intMethodWithOneArg(int p1) {
                 return 0;
             }

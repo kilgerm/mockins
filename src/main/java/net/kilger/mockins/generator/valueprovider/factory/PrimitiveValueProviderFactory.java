@@ -10,21 +10,19 @@ import net.kilger.mockins.generator.valueprovider.impl.FixedValueProvider;
 public class PrimitiveValueProviderFactory implements ValueProviderFactory {
 
     @SuppressWarnings("unchecked")
-    private static final List<Class<?>> PRIMITIVE_TYPES_AND_BOXED =  (List<Class<? extends Object>>)
-            Arrays.asList(
-                    (Class<?>) 
-                    Boolean.class, Boolean.TYPE,
-                    Byte.class, Byte.TYPE,
-                    Short.class, Short.TYPE,
-                    Integer.class, Integer.TYPE,
-                    Long.class, Long.TYPE,
-                    Float.class, Float.TYPE,
-                    Double.class, Double.TYPE,
-                    Character.class, Character.TYPE
-                    );
+    private static final List<Class<?>> PRIMITIVE_TYPES_AND_BOXED =  Arrays.asList(
+            (Class<?>) 
+            Boolean.class, Boolean.TYPE,
+            Byte.class, Byte.TYPE,
+            Short.class, Short.TYPE,
+            Integer.class, Integer.TYPE,
+            Long.class, Long.TYPE,
+            Float.class, Float.TYPE,
+            Double.class, Double.TYPE,
+            Character.class, Character.TYPE
+            );
     
     @SuppressWarnings("unchecked")
-    @Override
     public <T> ValueProvider<T> valueProvider(Class<T> clazz) {
         if (Boolean.class.equals(clazz) || Boolean.TYPE.equals(clazz)) {
             return (ValueProvider<T>) new FixedValueProvider(Boolean.FALSE, "false");
@@ -53,12 +51,10 @@ public class PrimitiveValueProviderFactory implements ValueProviderFactory {
         throw new IllegalArgumentException("cannot handle class " + clazz);
     }
 
-    @Override
     public boolean specificFor(Class<?> clazz) {
         return PRIMITIVE_TYPES_AND_BOXED.contains(clazz);
     }
 
-    @Override
     public boolean canHandle(Class<?> clazz) {
         return specificFor(clazz);
     }

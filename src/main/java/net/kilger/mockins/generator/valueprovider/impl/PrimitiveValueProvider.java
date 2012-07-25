@@ -12,17 +12,14 @@ public abstract class PrimitiveValueProvider implements ValueProvider<Object> {
         this.code = code;
     }
     
-    @Override
     public Object createValue() {
         return value;
     }
 
-    @Override
     public String code() {
         return code;
     }
 
-    @Override
     public boolean isMocking() {
         return false;
     }

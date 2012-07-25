@@ -15,7 +15,6 @@ public class StubInstruction implements Instruction {
         this.stubbing = stubbing;
     }
 
-    @Override
     public String message() {
         StringBuilder stubStatement = new StringBuilder();
         stubStatement.append(stubCode());

@@ -28,10 +28,8 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
         this.type = type;
     }
 
-    @Override
     public abstract String getDisplayName();
 
-    @Override
     public Class<?> getType() {
         return type;
     }
@@ -40,7 +38,6 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
         return initialValue == null;
     }
 
-    @Override
     public boolean wasInitiallyGiven() {
         return !wasInitiallyNull();
     }
@@ -49,7 +46,6 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
         return mockHelper.isMock(initialValue);        
     }
 
-    @Override
     public boolean isMock() {
         return valueProvider.isMocking();        
     }
@@ -63,28 +59,23 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
         return initialValue;
     }
 
-    @Override
     public ValueProvider<?> getValueProvider() {
         return valueProvider;
     }
 
-    @Override
     public void setValueProvider(ValueProvider<?> valueProvider) {
         this.valueProvider = valueProvider;
         this.currentValue = valueProvider.createValue();
     }
 
-    @Override
     public List<Stubbing> getStubbings() {
         return stubbings;
     }
 
-    @Override
     public Object getCurrentValue() {
         return currentValue;
     }
 
-    @Override
     public boolean isValueChanged() {
         // FIXME: not clear whether to use this "heuristic"
         boolean usingGivenValue = (valueProvider instanceof GivenValueProvider) 

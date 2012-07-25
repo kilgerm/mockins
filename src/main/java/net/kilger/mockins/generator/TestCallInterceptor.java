@@ -16,7 +16,6 @@ public class TestCallInterceptor<T> implements MethodInterceptor {
         this.originalObject = originalObject;
     }
 
-    @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         Object result = null;
         try {

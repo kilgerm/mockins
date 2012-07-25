@@ -14,23 +14,19 @@ public class MockitoHelper extends BaseMockHelper {
         Mockito.when(callMethod(mock, method, args)).thenReturn(value);
     }
 
-    @Override
     public boolean isMock(Object object) {
         // heuristically check toString()...
         return object.toString().startsWith("Mock for ");
     }
 
-    @Override
     public void reset(Object mock) {
         Mockito.reset(mock);
     }
 
-    @Override
     public void prepareMock(Object mock) {
         // nothing to do in Mockito
     }
 
-    @Override
     public Object prepareMockCode(String targetName) {
         return ""; // nothing to do in Mockito
     }
@@ -67,7 +63,6 @@ public class MockitoHelper extends BaseMockHelper {
         return Mockito.any(clazz);
     }
 
-    @Override
     public String argMatcherAnyCode(Class<?> clazz) {
         if (clazz.equals(Boolean.TYPE)) {
             return "Mockito.anyBoolean()";
@@ -99,18 +94,15 @@ public class MockitoHelper extends BaseMockHelper {
         return "Mockito.any(" + classLiteral(clazz) + ")";
     }
 
-    @Override
     public <T> T createMock(Class<T> clazz) {
         return Mockito.mock(clazz);
     }
 
-    @Override
     public String createMockCode(Class<?> clazz) {
         return "Mockito.mock(" + classLiteral(clazz) + ")";
     }
 
     // FIXME: Test
-    @Override
     public String addStubCode(String mockName, Stubbing stubbing) {
         StringBuilder stubStatement = new StringBuilder();
 

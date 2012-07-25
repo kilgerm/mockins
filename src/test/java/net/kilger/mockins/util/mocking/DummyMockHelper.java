@@ -35,7 +35,6 @@ public class DummyMockHelper extends BaseMockHelper {
 
     private static class DummyMockHelperInterceptor implements MethodInterceptor {
 
-        @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
             // don't ever stub equals or hashCode (TODO: check signature)
             if (method.getName().equals("equals") || method.getName().equals("hashCode") ) {
@@ -65,40 +64,33 @@ public class DummyMockHelper extends BaseMockHelper {
         }
     }
     
-    @Override
     public boolean isMock(Object object) {
         return object.toString().startsWith(MOCK_CLASS_PREFIX);
     }
 
-    @Override
     public void reset(Object mock) {
         if (stubbingsMap.containsKey(mock)) {
             stubbingsMap.remove(mock);
         }
     }
 
-    @Override
     public String addStubCode(String mockName, Stubbing stubbing) {
         return "$MOCK.STUB " + mockName + " : " + stubbing;
     }
 
-    @Override
     public void prepareMock(Object mock) {
         // nothing to do here
     }
 
-    @Override
     public Object prepareMockCode(String targetName) {
         return "$MOCK.PREPARE " + targetName;
     }
 
-    @Override
     public String argMatcherAnyCode(Class<?> typeToMock) {
         return "$MOCK.ANY(" + typeToMock.getSimpleName() + ")";
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public <T> T createMock(Class<T> clazz) {
         Enhancer e = new Enhancer();
         if (clazz.isInterface()) {
@@ -115,7 +107,6 @@ public class DummyMockHelper extends BaseMockHelper {
         return (T) enhanced;
     }
 
-    @Override
     public String createMockCode(Class<?> clazz) {
         return "$MOCK.CREATE(" + clazz.getSimpleName() + ")";
     }
