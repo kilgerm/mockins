@@ -37,7 +37,7 @@ public abstract class BaseMockHelper implements MockHelper {
         }
     }
 
-    private Object[] argMatcherAnyForAll(Class<?>[] methodParamTypes) {
+    protected Object[] argMatcherAnyForAll(Class<?>[] methodParamTypes) {
         int methodParamCount = methodParamTypes.length;
         Object[] methodArgMatchers = new Object[methodParamCount];
         for (int j = 0; j < methodParamCount; j++) {
