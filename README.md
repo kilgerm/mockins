@@ -48,5 +48,5 @@ TODO: version supported
 
 ## Requirements
 
-* You need a Java 6 JDK (no Java 5 support yet)
+* You need a Java 5+ JDK
 * and one of the supported mocking frameworks on your (test) classpath
