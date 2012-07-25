@@ -6,11 +6,7 @@ public final class MockHelperHolder {
         // not instantiable
     }
 
-    private static MockHelper mockHelper = defaultMockHelper();
-
-    private static MockHelper defaultMockHelper() {
-        return autodetectedMockHelper();
-    }
+    private static MockHelper mockHelper = null;
 
     private static MockHelper autodetectedMockHelper() {
         boolean hasMockito = isClassPresent("org.mockito.Mockito");
@@ -20,6 +16,12 @@ public final class MockHelperHolder {
             // logger.warn("multiple mocking frameworks detected - this is generally not desirable");
         }
         
+        /* 
+         * In case there are both mocking framework available, EasyMock
+         * is preferred for the simple reason it was the framework already
+         * in use in the project I first used Mockins for.
+         * This is not a statement about which mocking framework is better.
+         */
         if (hasEasyMock) {
             return new EasyMockHelper();
         }
@@ -28,7 +30,7 @@ public final class MockHelperHolder {
         }
         
         // this is fatal
-        throw new RuntimeException("No mocking framework has been detected. " +
+        throw new Error("No mocking framework has been detected. " +
         		"Please add a supported mocking framework to the test classpath. " +
         		"Consider the main documentation for supported mocking frameworks and versions.");
     }
@@ -44,7 +46,20 @@ public final class MockHelperHolder {
         return found;
     }
 
+    /**
+     * Returns the current mockhelper, autodetecting which one to use
+     * if none was explicitely configured. 
+     */
+    /*
+     * Note: This method is not synchronized, since even
+     * if you ran your tests in parallel,
+     * having multiple MockHelper instances should not 
+     * create any problems.
+     */
     public static MockHelper getMockHelper() {
+        if (mockHelper == null) {
+            mockHelper = autodetectedMockHelper();
+        }
         return mockHelper;
     }
 
