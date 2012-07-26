@@ -70,7 +70,7 @@ public class ValueProviderRegistryTest {
         assertEquals("new StringBuffer()", vp.code());
     }
 
-    private static class SIMPLE_CLASS {
+    public static class SIMPLE_CLASS {
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ValueProviderRegistryTest {
         assertTrue(vp.createValue() instanceof SIMPLE_CLASS);
     }
 
-    private static class INHERITED_CLASS extends SIMPLE_CLASS {
+    public static class INHERITED_CLASS extends SIMPLE_CLASS {
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ValueProviderRegistryTest {
         assertTrue(vp.createValue() instanceof INHERITED_CLASS);
     }
 
-    private static interface INTERFACE_CLASS {
+    public static interface INTERFACE_CLASS {
     }
 
     @Test
