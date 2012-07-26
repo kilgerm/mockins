@@ -1,4 +1,4 @@
-package net.kilger.mockins.generator;
+package net.kilger.mockins.handler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.kilger.mockins.generator.model.FieldInfo;
-import net.kilger.mockins.generator.model.ParamInfo;
-import net.kilger.mockins.generator.model.Stubbing;
-import net.kilger.mockins.generator.model.SubstitutableObjectInfo;
+import net.kilger.mockins.analysis.model.FieldInfo;
+import net.kilger.mockins.analysis.model.ParamInfo;
+import net.kilger.mockins.analysis.model.Stubbing;
+import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
+import net.kilger.mockins.common.LOG;
 import net.kilger.mockins.generator.result.model.CompositeInstruction;
 import net.kilger.mockins.generator.result.model.CreateFieldMockInstruction;
 import net.kilger.mockins.generator.result.model.CreateParameterMockInstruction;

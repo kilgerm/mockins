@@ -1,9 +1,6 @@
 package net.kilger.mockins.generator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
 import net.kilger.mockins.generator.result.InstructionTreeWalker;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
+import net.kilger.mockins.handler.NpeHandler;
 import net.kilger.mockins.util.MethodByNameComparator;
 import net.kilger.mockins.util.mocking.DummyMockHelper;
 import net.kilger.mockins.util.mocking.MockHelperHolder;

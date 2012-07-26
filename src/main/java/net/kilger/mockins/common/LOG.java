@@ -1,4 +1,4 @@
-package net.kilger.mockins.generator;
+package net.kilger.mockins.common;
 
 public final class LOG {
 

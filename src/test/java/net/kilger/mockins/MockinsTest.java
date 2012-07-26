@@ -2,6 +2,8 @@ package net.kilger.mockins;
 
 import static org.junit.Assert.*;
 
+import net.kilger.mockins.instructor.Instructor;
+
 import org.junit.Test;
 
 public class MockinsTest {
@@ -19,22 +21,22 @@ public class MockinsTest {
     }
     
     @Test
-    public void testInstructor() {
-        MyClass myClass = new MyClass();
-        
-        Object instructor = Mockins.instruct(myClass);
-        
-        assertTrue(instructor instanceof MyClass);
-        assertTrue(instructor instanceof Instructor);
-    }
+        public void testInstructoror() {
+            MyClass myClass = new MyClass();
+            
+            Object instructor = Mockins.instructor(myClass);
+            
+            assertTrue(instructor instanceof MyClass);
+            assertTrue(instructor instanceof Instructor);
+        }
     
     @Test
-    public void testInstructorCall() {
-        MyClass myClass = new MyClass();
-        
-        MyClass instructor = Mockins.instruct(myClass);
-        instructor.myMethod("", new MyArg());
-    }
+        public void testInstructororCall() {
+            MyClass myClass = new MyClass();
+            
+            MyClass instructor = Mockins.instructor(myClass);
+            instructor.myMethod("", new MyArg());
+        }
     
    
 }

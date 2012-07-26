@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import net.kilger.mockins.generator.model.Stubbing;
+import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.GivenValueProvider;
 

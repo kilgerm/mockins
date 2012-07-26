@@ -17,7 +17,7 @@ public class InfoToolTest {
         //   classUnderTest.something(param0, new Object());
         
         // so we now use the instructed object
-        InfoTool instructed = Mockins.instruct(classUnderTest);
+        InfoTool instructed = Mockins.instructor(classUnderTest);
         
         // this still throws an NPE, but also generates and prints
         // the mock code to get rid of it...
