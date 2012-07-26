@@ -1,14 +1,15 @@
-package net.kilger.mockins.generator;
+package net.kilger.mockins.instructor;
 
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import net.kilger.mockins.generator.result.model.Instruction;
+import net.kilger.mockins.handler.NpeHandler;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class TestCallInterceptor<T> implements MethodInterceptor {
+public class InstructorInterceptor<T> implements MethodInterceptor {
     
     private static final String MOCKINS_RESULT_HEADER = 
             "==============================================================================\n" +
@@ -18,7 +19,7 @@ public class TestCallInterceptor<T> implements MethodInterceptor {
     
     private final T originalObject;
 
-    public TestCallInterceptor(T originalObject) {
+    public InstructorInterceptor(T originalObject) {
         this.originalObject = originalObject;
     }
 

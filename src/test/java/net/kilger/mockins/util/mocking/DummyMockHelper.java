@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.kilger.mockins.generator.model.Stubbing;
+import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.factory.PrimitiveValueProviderFactory;
 import net.kilger.mockins.generator.valueprovider.impl.FixedValueProvider;

@@ -1,11 +1,9 @@
 package net.kilger.mockins;
 
-
-import net.kilger.mockins.generator.TestCallInterceptor;
-import net.sf.cglib.proxy.Enhancer;
+import net.kilger.mockins.instructor.InstructorFactory;
 
 /**
- * <p>This is the base API class to use Mockins.</p>
+ * <p>This is the main API for Mockins.</p>
  * <p>
  * Example:
  * <pre>
@@ -25,20 +23,13 @@ import net.sf.cglib.proxy.Enhancer;
 public final class Mockins {
 
     /**
-     * Creates an "instructed" instance. Test calls of methods on this object 
-     * will be watched and in case of an NPE, Mockins will search
-     * automatically for a working set of mocks/stubs so that the 
-     * NPE resolved.
+     * Adds an "instructor" to an object to test. 
+     * Calls of methods on this object will be watched and 
+     * in case of an NPE, Mockins will search automatically 
+     * for a working set of mocks/stubs that will resolve the NPE.
      */
-    @SuppressWarnings("unchecked")
-    public static <T> T instruct(T classUnderTest) {
-        Class<? extends Object> clazz = classUnderTest.getClass();
-
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(clazz);
-        enhancer.setInterfaces(new Class<?>[] { Instructor.class });
-        enhancer.setCallback(new TestCallInterceptor<T>(classUnderTest));
-        return (T) enhancer.create();
+    public static <T> T instructor(T classUnderTest) {
+        return new InstructorFactory().create(classUnderTest);
     }
     
     /**

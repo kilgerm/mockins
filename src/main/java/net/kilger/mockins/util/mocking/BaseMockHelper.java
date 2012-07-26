@@ -3,7 +3,7 @@ package net.kilger.mockins.util.mocking;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import net.kilger.mockins.generator.model.Stubbing;
+import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.ClassNamerHolder;
 

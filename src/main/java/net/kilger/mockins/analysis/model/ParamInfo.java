@@ -1,4 +1,4 @@
-package net.kilger.mockins.generator.model;
+package net.kilger.mockins.analysis.model;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
