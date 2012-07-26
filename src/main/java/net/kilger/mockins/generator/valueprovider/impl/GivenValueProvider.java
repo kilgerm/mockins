@@ -6,10 +6,4 @@ public class GivenValueProvider extends FixedValueProvider {
         super(givenValue, "<given>");
     }
 
-// FIXME: not sure actually!
-//    @Override
-//    public boolean isMocking() {
-//        return false;
-//    }
-
 }

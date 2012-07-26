@@ -12,9 +12,9 @@ import net.sf.cglib.proxy.MethodProxy;
 public class InstructorInterceptor<T> implements MethodInterceptor {
     
     private static final String MOCKINS_RESULT_HEADER = 
-            "==============================================================================\n" +
-            "* Mockins result *\n" +
-            "==============================================================================\n" + "";
+            "//============================================================================\n" +
+            "// * Mockins result *\n" +
+            "//============================================================================\n" + "";
     
     
     private final T originalObject;
@@ -54,6 +54,7 @@ public class InstructorInterceptor<T> implements MethodInterceptor {
     }
 
     private void printResults(Instruction instructions) {
+        System.err.flush();
         System.err.println(MOCKINS_RESULT_HEADER);
         if (instructions != null) {
             System.err.println(instructions);

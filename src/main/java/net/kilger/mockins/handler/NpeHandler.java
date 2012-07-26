@@ -19,6 +19,7 @@ import net.kilger.mockins.generator.result.model.CreateParameterMockInstruction;
 import net.kilger.mockins.generator.result.model.CreateValueInstruction;
 import net.kilger.mockins.generator.result.model.GenericInstruction;
 import net.kilger.mockins.generator.result.model.Instruction;
+import net.kilger.mockins.generator.result.model.InvokeTestMethodInstruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
@@ -98,10 +99,11 @@ public class NpeHandler {
     }
 
     private Instruction resultInstruction() {
-        GenericInstruction instruction = new GenericInstruction("ok with the following mocks, stubbings and parameters:\n");
+        GenericInstruction instruction = new GenericInstruction("// method call will succeed with the following mocks and stubbings:\n");
+        String classUnderTestName = "classUnderTest.";
 
         for (FieldInfo fieldInfo : fieldInfos) {
-            String targetName = "classUnderTest." + fieldInfo.getField().getName();
+            String targetName = classUnderTestName + fieldInfo.getField().getName();
             
             if (fieldInfo.isMock()) {
                 CompositeInstruction mockFieldInstruction = new CreateFieldMockInstruction(targetName, fieldInfo.getType(), fieldInfo.getValueProvider().code());
@@ -112,7 +114,7 @@ public class NpeHandler {
             }
             else {
                 if (fieldInfo.isValueChanged()) {
-                    CreateValueInstruction createValueInstruction = new CreateValueInstruction(targetName, fieldInfo.getValueProvider().code());
+                    CreateValueInstruction createValueInstruction = new CreateValueInstruction(targetName, fieldInfo.getValueProvider().code(), fieldInfo.getType());
                     instruction.addComponent(createValueInstruction);
                 }
             }
@@ -130,11 +132,12 @@ public class NpeHandler {
             }
             else {
                 // print parameter values even if unchanged
-                CreateValueInstruction createValueInstruction = new CreateValueInstruction(paramName, paramInfo.getValueProvider().code());
+                CreateValueInstruction createValueInstruction = new CreateValueInstruction(paramName, paramInfo.getValueProvider().code(), paramInfo.getType());
                 instruction.addComponent(createValueInstruction);
             }
-            
         }
+        
+        instruction.addComponent(new InvokeTestMethodInstruction(classUnderTestName, method, paramInfos));
         return instruction;
     }
 

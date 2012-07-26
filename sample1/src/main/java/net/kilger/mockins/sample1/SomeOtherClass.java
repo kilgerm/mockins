@@ -1,10 +1,10 @@
 package net.kilger.mockins.sample1;
 
-public class InfoSource {
+public class SomeOtherClass {
 
     private String data;
 
-    public InfoSource(String data) {
+    public SomeOtherClass(String data) {
         this.data = data;
     }
 
