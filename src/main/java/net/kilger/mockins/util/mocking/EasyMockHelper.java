@@ -61,7 +61,7 @@ public class EasyMockHelper extends BaseMockHelper {
         EasyMock.replay(mock);
     }
 
-    public Object prepareMockCode(String targetName) {
+    public String prepareMockCode(String targetName) {
         return "EasyMock.replay("+ targetName + ")";
     }
 

@@ -14,12 +14,11 @@ public interface MockHelper {
     String addStubCode(String mockName, Stubbing stubbing);
     
     void prepareMock(Object mock);
-    Object prepareMockCode(String targetName);
+    String prepareMockCode(String targetName);
 
     String argMatcherAnyCode(Class<?> typeToMock);
 
     <T> T createMock(Class<T> clazz);
     String createMockCode(Class<?> clazz);
-
 
 }

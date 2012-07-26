@@ -88,7 +88,7 @@ public class DummyMockHelper extends BaseMockHelper {
         // nothing to do here
     }
 
-    public Object prepareMockCode(String mockName) {
+    public String prepareMockCode(String mockName) {
         return "$MOCK.PREPARE(" + mockName + ")";
     }
 

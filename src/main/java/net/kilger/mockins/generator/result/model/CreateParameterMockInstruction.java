@@ -28,7 +28,12 @@ public class CreateParameterMockInstruction extends CompositeInstruction {
                 .append(targetName)
                 .append(" = ").append(valueCreationCode).append(";\n");
         message.append(super.message());
-        message.append(mockHelper.prepareMockCode(targetName)).append(";\n");
+        
+        String prepareMockCode = mockHelper.prepareMockCode(targetName);
+        if (!prepareMockCode.isEmpty()) {
+            message.append(prepareMockCode).append(";\n");
+        }
+        
         return message.toString();
     }
 

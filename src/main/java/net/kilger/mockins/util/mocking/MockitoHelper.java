@@ -27,7 +27,7 @@ public class MockitoHelper extends BaseMockHelper {
         // nothing to do in Mockito
     }
 
-    public Object prepareMockCode(String targetName) {
+    public String prepareMockCode(String targetName) {
         return ""; // nothing to do in Mockito
     }
 
