@@ -30,7 +30,7 @@ Mockins then runs testMethod and tries to add mocks/stubs
 for null-valued parameters and fields so that the method does not throw a NPE anymore.
 If it succeeds, the necessary mocks will be output (to stderr) like this:
 
-```
+``` java
 //============================================================================
 // * Mockins result *
 //============================================================================
