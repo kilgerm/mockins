@@ -89,13 +89,13 @@
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
-			<version>3.1</version>
+			<version>[3.0,)</version> <!-- any version >= 3.0 -->
 			<scope>provided</scope>
 		</dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>1.9.0</version>
+            <version>[1.8.0,)</version> <!-- any version >= 1.8.0 -->
 			<scope>provided</scope>
         </dependency>
         
