@@ -10,6 +10,10 @@ import net.sf.cglib.proxy.MethodProxy;
 
 public class TestCallInterceptor<T> implements MethodInterceptor {
     
+    private static final String MOCKINS_RESULT_HEADER = "==============================================================================\n" +
+            "* START Mockins result *\n" +
+            "==============================================================================\n" + "";
+    
     private final T originalObject;
 
     public TestCallInterceptor(T originalObject) {
@@ -29,8 +33,13 @@ public class TestCallInterceptor<T> implements MethodInterceptor {
                 NullPointerException originalNpe = (NullPointerException) cause;
                 NpeHandler npeHandler = new NpeHandler(originalObject, method, args);
                 Instruction instructions = npeHandler.handle();
+
+                System.err.println(MOCKINS_RESULT_HEADER);
                 if (instructions != null) {
                     System.err.println(instructions);
+                }
+                else {
+                    System.err.println("no suitable mocking/stubbing found");
                 }
                 throw originalNpe;
             }

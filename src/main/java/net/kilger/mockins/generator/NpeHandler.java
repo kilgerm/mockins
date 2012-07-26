@@ -1,7 +1,5 @@
 package net.kilger.mockins.generator;
 
-import static net.kilger.mockins.generator.LOG.*;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -49,52 +47,52 @@ public class NpeHandler {
     }
 
     public Instruction handle() {
-        l("handle");
+        LOG.debug("start handle NPE");
         init();
 
         retry();
         if (!hasNpe) {
-            l("no npe - nothing to do");
+            LOG.info("no npe - nothing to do");
             return null;
         }
 
-        l("fill all params and fields");
+        LOG.info("fill all params and fields");
         fillAllParams();
         fillAllFields();
 
         retry();
         if (!hasNpe) {
-            l("no npe after subst params and fields");
+            LOG.info("no npe after subst params and fields");
 
-            l("removing unneccessary params and fields");
+            LOG.info("removing unneccessary params and fields");
             removeNullableParams();
             removeNullableFields();
             
             return resultInstruction();
         }
 
-        l("still npe after subst params and fields");
+        LOG.info("still npe after subst params and fields");
 
         createAllStubbingsForParams();
         createAllStubbingsForFields();
 
         retry();
         if (!hasNpe) {
-            l("ok now after stubbing all");
+            LOG.info("ok now after stubbing all");
             verifyAllStubsReproducable();
 
-            l("removing unneccessary params and fields");
+            LOG.debug("removing unneccessary params and fields");
             removeNullableParams();
             removeNullableFields();
             
-            l("removing unneccessary stubs for params and fields");
+            LOG.debug("removing unneccessary stubs for params and fields");
             removeUnneccesaryStubbingsForParams();
             removeUnneccesaryStubbingsForFields();
             
             return resultInstruction();
         }
 
-        l("stubbed all, still NPE - nothing we can do...");
+        LOG.error("stubbed all, still NPE - nothing we can do...");
         throw latestNpe;
     }
 
@@ -164,10 +162,10 @@ public class NpeHandler {
                 substitutableObjectInfo.getStubbings().set(j, Stubbing.EMPTY);
                 retry();
                 if (!hasNpe) {
-                    l("not required: " + stubbingToTest);
+                    LOG.debug("not required: " + stubbingToTest);
                 }
                 else {
-                    l("required: " + stubbingToTest);
+                    LOG.debug("required: " + stubbingToTest);
                     substitutableObjectInfo.getStubbings().set(j, stubbingToTest);
                 }
             }
@@ -193,7 +191,7 @@ public class NpeHandler {
         for (SubstitutableObjectInfo substitutable : substitutableObjectInfos) {
 
             if (substitutable.isMock()) {
-                l(substitutable.getDisplayName() + " stubbing");
+                LOG.debug(substitutable.getDisplayName() + " stubbing");
 
                 /* 
                  * Use reflection util to access even protected/default methods.
@@ -212,7 +210,7 @@ public class NpeHandler {
                     Class<?> returnType = method.getReturnType();
                     Class<?>[] methodParamTypes = method.getParameterTypes();
                     int methodParamCount = methodParamTypes.length;
-                    l("  stub " + method + " with " + methodParamCount + " params and returntype " + returnType);
+                    LOG.debug("  stub " + method + " with " + methodParamCount + " params and returntype " + returnType);
 
                     ValueProvider<?> vp = ValueProviderRegistry.providerFor(returnType);
 
@@ -220,7 +218,7 @@ public class NpeHandler {
                     substitutable.getStubbings().add(stubbing);
                 }
             } else {
-                l(substitutable.getDisplayName() + " skip " + substitutable.getCurrentValue());
+                LOG.debug(substitutable.getDisplayName() + " skip " + substitutable.getCurrentValue());
             }
         }
     }
@@ -271,7 +269,7 @@ public class NpeHandler {
         for (SubstitutableObjectInfo substitutable : substitutables) {
             String displayName = substitutable.getDisplayName();
             if (substitutable.wasInitiallyGiven()) {
-                l("not touching: " + displayName);
+                LOG.debug("not touching: " + displayName);
                 continue;
             }
             ValueProvider<?> originalVp = substitutable.getValueProvider();
@@ -281,11 +279,11 @@ public class NpeHandler {
             retry();
             
             if (hasNpe) {
-                l(displayName + ": may not be null");
+                LOG.debug(displayName + ": may not be null");
                 substitutable.setValueProvider(originalVp);
             }
             else {
-                l(displayName + ": may be null");
+                LOG.debug(displayName + ": may be null");
             }
         }
     }
@@ -311,7 +309,7 @@ public class NpeHandler {
         for (FieldInfo fieldInfo : fieldInfos) {
             Field field = fieldInfo.getField();
             field.setAccessible(true); // FIXME: actually check?
-            l("setting field " + field + " to " + fieldInfo.getValueProvider().code());
+            LOG.debug("setting field " + field + " to " + fieldInfo.getValueProvider().code());
             try {
                 field.set(classUnderTest, fieldInfo.getCurrentValue());
             } catch (IllegalArgumentException e) {
@@ -339,10 +337,10 @@ public class NpeHandler {
                     try {
                         mockHelper.addStub(mock, stubbing);
                     } catch (IllegalAccessException e) {
-                        l("stubbing failed:" + e);
+                        LOG.error("stubbing failed:" + e);
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
-                        l("stubbing failed:" + e);
+                        LOG.error("stubbing failed:" + e);
                         e.printStackTrace();
                     }
                 }
@@ -362,7 +360,7 @@ public class NpeHandler {
     private void fillAllFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
         for (SubstitutableObjectInfo soi : substitutableObjectInfos) {
             if (!soi.wasInitiallyGiven()) {
-                l("substitute null " + soi.getDisplayName());
+                LOG.debug("substitute null " + soi.getDisplayName());
                 ValueProvider<?> vp = ValueProviderRegistry.providerFor(soi.getType());
                 soi.setValueProvider(vp);
             }

@@ -24,9 +24,7 @@ public class CgLibTest {
         enhancer.setSuperclass(A.class);
         Callback callback = new MethodInterceptor() {
             public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-//                System.out.println(">> intercept: " + method + "," + args + "," + proxy);
                 Object result = proxy.invokeSuper(obj, args);
-//                System.out.println("<< yielded result: " + result);
                 intercepted = true;
                 return result;
             }
@@ -46,7 +44,6 @@ public class CgLibTest {
         boolean done = false;
         
         public Object something() {
-//            System.out.println("doing something");
             done = true;
             return "X";
         }
