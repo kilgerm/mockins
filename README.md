@@ -45,10 +45,9 @@ classUnderTest.myMethod(param0, param1);
 ## Mocking Frameworks
 
 Mockins supports the following mocking frameworks:
-* EasyMock <http://easymock.org/>
-* Mockito <http://mockito.googlecode.com>
+* Mockito <http://mockito.googlecode.com> (version 1.8.0 or newer)
+* EasyMock <http://easymock.org/> (version 3.0 or newer)
 
-TODO: version supported
 
 ## Requirements
 
