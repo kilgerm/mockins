@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 public class Stubbing {
@@ -50,4 +51,19 @@ public class Stubbing {
     public Object createValue() {
         return valueProvider.createValue();
     }
+    
+    public boolean equals(Object o) {
+        if (o instanceof Stubbing) {
+            Stubbing otherStubbing = (Stubbing) o;
+            return new EqualsBuilder()
+                .append(method, otherStubbing.method)
+                .append(valueProvider, otherStubbing.valueProvider)
+                .append(methodParamTypes, otherStubbing.methodParamTypes)
+                .isEquals();
+        }
+        else {
+            return false;
+        }
+    }
+    
 }

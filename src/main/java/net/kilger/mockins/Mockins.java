@@ -36,6 +36,7 @@ public final class Mockins {
 
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
+        enhancer.setInterfaces(new Class<?>[] { Instructor.class });
         enhancer.setCallback(new TestCallInterceptor<T>(classUnderTest));
         return (T) enhancer.create();
     }
