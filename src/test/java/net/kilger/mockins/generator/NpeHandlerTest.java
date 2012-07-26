@@ -1,6 +1,9 @@
 package net.kilger.mockins.generator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,7 +14,10 @@ import net.kilger.mockins.generator.result.InstructionTreeWalker;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.util.MethodByNameComparator;
+import net.kilger.mockins.util.mocking.DummyMockHelper;
+import net.kilger.mockins.util.mocking.MockHelperHolder;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -99,6 +105,11 @@ public class NpeHandlerTest {
         }
     }
 
+    @BeforeClass
+    public static void useDummyMockHelper() {
+        MockHelperHolder.setMockHelper(new DummyMockHelper());
+    }
+    
     @Test
     public void testMockNullParam() throws SecurityException, NoSuchMethodException {
         A1 a = new A1();
@@ -111,7 +122,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B.class);"));
+                result.contains("$MOCK.CREATE(B.class);"));
     }
 
     @Test
@@ -126,7 +137,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B.class);"));
+                result.contains("$MOCK.CREATE(B.class);"));
         assertTrue("arg0 should not be dealt with, since given (even if it could be null)", 
                 result.contains("param0 = <given>"));
     }
@@ -143,7 +154,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B.class);"));
+                result.contains("$MOCK.CREATE(B.class);"));
         assertTrue("arg0 should not be mocked as it can be null", 
                 result.contains("param0 = null"));
     }
@@ -160,7 +171,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B.class);"));
+                result.contains("$MOCK.CREATE(B.class);"));
         assertTrue("result must have stub for getData()", 
                 result.contains(".getData()"));
     }
@@ -177,7 +188,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B2.class);"));
+                result.contains("$MOCK.CREATE(B2.class);"));
         assertTrue("result must have stub for getData()", 
                 result.contains(".getData()"));
         assertFalse("result should not have stub for getMoreData()", 
@@ -291,7 +302,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("classUnderTest.field0 = EasyMock.createMock(C.class);"));
+                result.contains("classUnderTest.field0 = $MOCK.CREATE(C.class);"));
     }
 
     @Test
@@ -307,7 +318,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("EasyMock.createMock(B.class);"));
+                result.contains("$MOCK.CREATE(B.class);"));
         assertFalse("field0 should not be dealt with, since given", 
                 result.contains("field0 = "));
     }
@@ -328,9 +339,9 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have mock for field0", 
-                result.contains("field0 = EasyMock.createMock(C.class);"));
+                result.contains("field0 = $MOCK.CREATE(C.class);"));
         assertTrue("result must have mock for field2", 
-                result.contains("field2 = EasyMock.createMock(B.class);"));
+                result.contains("field2 = $MOCK.CREATE(B.class);"));
         assertFalse("result must have not mock for field1", 
                 result.contains("field1 ="));
     }
@@ -351,9 +362,9 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have mock for field0", 
-                result.contains("field0 = EasyMock.createMock(C.class);"));
+                result.contains("field0 = $MOCK.CREATE(C.class);"));
         assertTrue("result must have mock for field2", 
-                result.contains("field2 = EasyMock.createMock(B.class);"));
+                result.contains("field2 = $MOCK.CREATE(B.class);"));
         assertFalse("result must have no mock for field1", 
                 result.contains("field1 ="));
     }
@@ -370,7 +381,7 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("field0 = EasyMock.createMock(B.class);"));
+                result.contains("field0 = $MOCK.CREATE(B.class);"));
         assertTrue("result must have stub for getData()", 
                 result.contains(".getData()"));
     }
@@ -397,9 +408,9 @@ public class NpeHandlerTest {
         System.err.println(result);
         assertNotNull(result);
         assertTrue("result must have statement for mock", 
-                result.contains("field0 = EasyMock.createMock(B.class);"));
+                result.contains("field0 = $MOCK.CREATE(B.class);"));
         assertTrue("result must have statement for mock", 
-                result.contains("field1 = EasyMock.createMock(B.class);"));
+                result.contains("field1 = $MOCK.CREATE(B.class);"));
 
         new InstructionTreeWalker() {
             @Override

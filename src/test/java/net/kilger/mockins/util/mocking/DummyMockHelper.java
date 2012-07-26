@@ -9,6 +9,8 @@ import net.kilger.mockins.generator.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.factory.PrimitiveValueProviderFactory;
 import net.kilger.mockins.generator.valueprovider.impl.FixedValueProvider;
+import net.kilger.mockins.util.ClassNamer;
+import net.kilger.mockins.util.SimpleClassNamer;
 import net.sf.cglib.core.DefaultNamingPolicy;
 import net.sf.cglib.core.Predicate;
 import net.sf.cglib.proxy.Enhancer;
@@ -64,6 +66,10 @@ public class DummyMockHelper extends BaseMockHelper {
         }
     }
     
+    // ---
+    
+    private ClassNamer classNamer = new SimpleClassNamer();
+    
     public boolean isMock(Object object) {
         return object.toString().startsWith(MOCK_CLASS_PREFIX);
     }
@@ -75,19 +81,19 @@ public class DummyMockHelper extends BaseMockHelper {
     }
 
     public String addStubCode(String mockName, Stubbing stubbing) {
-        return "$MOCK.STUB " + mockName + " : " + stubbing;
+        return "$MOCK.STUB(" + mockName + "." + stubbing.getMethod().getName() + ", " + stubbing + ")";
     }
 
     public void prepareMock(Object mock) {
         // nothing to do here
     }
 
-    public Object prepareMockCode(String targetName) {
-        return "$MOCK.PREPARE " + targetName;
+    public Object prepareMockCode(String mockName) {
+        return "$MOCK.PREPARE(" + mockName + ")";
     }
 
     public String argMatcherAnyCode(Class<?> typeToMock) {
-        return "$MOCK.ANY(" + typeToMock.getSimpleName() + ")";
+        return "$MOCK.ANY(" + classNamer.classLiteral(typeToMock) + ")";
     }
 
     @SuppressWarnings("unchecked")
@@ -108,7 +114,7 @@ public class DummyMockHelper extends BaseMockHelper {
     }
 
     public String createMockCode(Class<?> clazz) {
-        return "$MOCK.CREATE(" + clazz.getSimpleName() + ")";
+        return "$MOCK.CREATE(" + classNamer.classLiteral(clazz) + ")";
     }
 
     @Override
