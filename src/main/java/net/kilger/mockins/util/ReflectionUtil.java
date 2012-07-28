@@ -11,6 +11,7 @@ public class ReflectionUtil {
 
     private Class<?> clazz;
     private boolean caseSensitive = false;
+    private ReflectionUtil superClassUtil = null;
     
     public ReflectionUtil(Class<?> clazz) {
         this.clazz = clazz;
@@ -86,11 +87,18 @@ public class ReflectionUtil {
         if (superclass != null) {
             if (includeObjectMethods || !Object.class.equals(superclass)) {
                 // recursively add methods
-                // TODO: might want to save recursive instances to avoid duplicate instantiation
-                methods.addAll(new ReflectionUtil(superclass).getAllMethodsInternal(includeObjectMethods));
+                List<Method> superClassMethods = getInstanceForSuperClass().getAllMethodsInternal(includeObjectMethods);
+                methods.addAll(superClassMethods);
             }
         }
         return methods;
+    }
+
+    private ReflectionUtil getInstanceForSuperClass() {
+        if (superClassUtil == null) {
+            superClassUtil = new ReflectionUtil(clazz.getSuperclass());
+        }
+        return superClassUtil;
     }
 
     private boolean nameMatches(Method candidate, String name) {
