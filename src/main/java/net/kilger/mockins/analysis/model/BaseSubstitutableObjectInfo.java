@@ -46,10 +46,6 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
         return mockHelper.isMock(initialValue);        
     }
 
-    public boolean isMock() {
-        return valueProvider.isMocking();        
-    }
-
     public Object createValue() {
         currentValue = valueProvider.createValue();
         return currentValue;

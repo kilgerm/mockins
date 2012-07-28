@@ -5,12 +5,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.kilger.mockins.analysis.model.FieldInfo;
 import net.kilger.mockins.analysis.model.ParamInfo;
-import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
 import net.kilger.mockins.common.LOG;
 import net.kilger.mockins.generator.result.model.CompositeInstruction;
@@ -20,16 +18,13 @@ import net.kilger.mockins.generator.result.model.CreateValueInstruction;
 import net.kilger.mockins.generator.result.model.GenericInstruction;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.InvokeTestMethodInstruction;
-import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
+import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
-import net.kilger.mockins.util.ReflectionUtil;
-import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 
-public class NpeHandler {
+public class NpeHandler implements RetryCallback {
 
     private final Object classUnderTest;
     private final Method method;
@@ -38,7 +33,6 @@ public class NpeHandler {
     private int argLength;
     private NullPointerException latestNpe;
 
-    private MockHelper mockHelper = MockHelperHolder.getMockHelper();
     private List<ParamInfo> paramInfos;
     private List<FieldInfo> fieldInfos;
 
@@ -105,10 +99,12 @@ public class NpeHandler {
         for (FieldInfo fieldInfo : fieldInfos) {
             String targetName = classUnderTestName + fieldInfo.getField().getName();
             
-            if (fieldInfo.isMock()) {
+            if (fieldInfo.getValueProvider() instanceof MockValueProvider) {
+                MockValueProvider mvp = (MockValueProvider) fieldInfo.getValueProvider();
+
                 CompositeInstruction mockFieldInstruction = new CreateFieldMockInstruction(targetName, fieldInfo.getType(), fieldInfo.getValueProvider().code());
 
-                addStubbingInstructions(mockFieldInstruction, targetName, fieldInfo);
+                mvp.addStubbingInstructions(mockFieldInstruction, targetName);
 
                 instruction.addComponent(mockFieldInstruction);
             }
@@ -123,10 +119,12 @@ public class NpeHandler {
         for (SubstitutableObjectInfo paramInfo : paramInfos) {
             String paramName = paramInfo.getDisplayName();
             
-            if (paramInfo.isMock()) {
+            if (paramInfo.getValueProvider() instanceof MockValueProvider) {
+                MockValueProvider mvp = ((MockValueProvider) paramInfo.getValueProvider());
+
                 CreateParameterMockInstruction mockArgumentInstruction = new CreateParameterMockInstruction(paramName, paramInfo.getType(), paramInfo.getValueProvider().code());
                 
-                addStubbingInstructions(mockArgumentInstruction, paramName, paramInfo);
+                mvp.addStubbingInstructions(mockArgumentInstruction, paramName);
                 
                 instruction.addComponent(mockArgumentInstruction);
             }
@@ -141,16 +139,6 @@ public class NpeHandler {
         return instruction;
     }
 
-    private void addStubbingInstructions(CompositeInstruction createMockInstruction, String paramName, SubstitutableObjectInfo soi) {
-        for (Stubbing stubbing : soi.getStubbings()) {
-            if (stubbing.isEmpty()) {
-                continue;
-            }
-            StubInstruction stubInstruction = new StubInstruction(paramName, stubbing);
-            createMockInstruction.addComponent(stubInstruction);
-        }
-    }
-
     private void removeUnneccesaryStubbingsForParams() {
         removeUnnecessaryStubbingsFor(paramInfos);
     }
@@ -161,18 +149,11 @@ public class NpeHandler {
 
     private void removeUnnecessaryStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
         for (SubstitutableObjectInfo substitutableObjectInfo : substitutableObjectInfos) {
-            for (int j = 0; j < substitutableObjectInfo.getStubbings().size(); j++) {
-                Stubbing stubbingToTest = substitutableObjectInfo.getStubbings().get(j);
-                substitutableObjectInfo.getStubbings().set(j, Stubbing.EMPTY);
-                retry();
-                if (!hasNpe) {
-                    LOG.debug("not required: " + stubbingToTest);
-                }
-                else {
-                    LOG.debug("required: " + stubbingToTest);
-                    substitutableObjectInfo.getStubbings().set(j, stubbingToTest);
-                }
+            if (substitutableObjectInfo.getValueProvider() instanceof MockValueProvider) {
+                MockValueProvider mvp = (MockValueProvider) substitutableObjectInfo.getValueProvider();
+                mvp.removeUneccesaryStubbings(this);
             }
+            
         }
     }
 
@@ -194,71 +175,16 @@ public class NpeHandler {
     private void createAllStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
         for (SubstitutableObjectInfo substitutable : substitutableObjectInfos) {
 
-            if (substitutable.isMock()) {
-                LOG.debug(substitutable.getDisplayName() + " stubbing");
-
-                /* 
-                 * Use reflection util to access even protected/default methods.
-                 * Note that these *might* not be accessible from the client,
-                 * but we don't know at this point...
-                 */
-                Method[] methods = new ReflectionUtil(substitutable.getType()).getAllMethods().toArray(new Method[] {});
+            if (substitutable.getValueProvider() instanceof MockValueProvider) {
+                MockValueProvider vp = (MockValueProvider) substitutable.getValueProvider();
+                vp.addAllStubs();
                 
-                for (Method method : methods) {
-
-                    if (!shouldBeStubbed(method)) {
-                        // l("not stubbing: " + method);
-                        continue;
-                    }
-                    
-                    Class<?> returnType = method.getReturnType();
-                    Class<?>[] methodParamTypes = method.getParameterTypes();
-                    int methodParamCount = methodParamTypes.length;
-                    LOG.debug("  stub " + method + " with " + methodParamCount + " params and returntype " + returnType);
-
-                    ValueProvider<?> vp = ValueProviderRegistry.providerFor(returnType);
-
-                    Stubbing stubbing = new Stubbing(method, vp, methodParamTypes);
-                    substitutable.getStubbings().add(stubbing);
-                }
             } else {
                 LOG.debug(substitutable.getDisplayName() + " skip " + substitutable.getCurrentValue());
             }
         }
     }
-
-    private boolean shouldBeStubbed(Method method) {
-        return needsToBeStubbed(method) && canBeStubbed(method);
-    }
-
-    private boolean needsToBeStubbed(Method method) {
-        Class<?> returnType = method.getReturnType();
-
-        if (returnType.equals(Void.TYPE)) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-
-        if (returnType.isPrimitive()) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-        
-        return true;
-    }
-
-    private boolean canBeStubbed(Method method) {
-        if (Modifier.isFinal(method.getModifiers())) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-
-        // FIXME: rather getDeclaringClass() not Object?
-        List<String> disallowed = Arrays.asList("equals", "hashCode", "getClass", "toString");
-        if (disallowed.contains(method.getName())) {
-            return false;
-        }
-        
-        return true;
-    }
-
+    
     private void removeNullableParams() {
         // try out, which params are actually mandatory
         trySubstituteNullValueProvider(paramInfos);
@@ -292,12 +218,11 @@ public class NpeHandler {
         }
     }
     
-    private void retry() {
+    public Result retry() {
         buildCurrentValues();
         insertFields();
-        applyStubsToMocksForParams();
-        applyStubsToMocksForFields();
         retryInvocation();
+        return new Result(hasNpe);
     }
 
     private void buildCurrentValues() {
@@ -312,7 +237,7 @@ public class NpeHandler {
     private void insertFields() {
         for (FieldInfo fieldInfo : fieldInfos) {
             Field field = fieldInfo.getField();
-            field.setAccessible(true); // FIXME: actually check?
+            field.setAccessible(true); // ignore accessibility
             LOG.debug("setting field " + field + " to " + fieldInfo.getValueProvider().code());
             try {
                 field.set(classUnderTest, fieldInfo.getCurrentValue());
@@ -320,35 +245,6 @@ public class NpeHandler {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
-            }
-        }
-    }
-
-    private void applyStubsToMocksForParams() {
-        applyStubsToMocksFor(paramInfos);
-    }
-    
-    private void applyStubsToMocksForFields() {
-        applyStubsToMocksFor(fieldInfos);
-    }
-
-    private void applyStubsToMocksFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
-        for (SubstitutableObjectInfo soi : substitutableObjectInfos) {
-            if (soi.isMock()) {
-                Object mock = soi.getCurrentValue();
-                mockHelper.reset(mock);
-                for (Stubbing stubbing : soi.getStubbings()) {
-                    try {
-                        mockHelper.addStub(mock, stubbing);
-                    } catch (IllegalAccessException e) {
-                        LOG.error("stubbing failed:" + e);
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        LOG.error("stubbing failed:" + e);
-                        e.printStackTrace();
-                    }
-                }
-                mockHelper.prepareMock(mock);
             }
         }
     }

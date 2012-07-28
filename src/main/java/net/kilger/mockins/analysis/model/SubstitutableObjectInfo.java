@@ -1,8 +1,6 @@
 package net.kilger.mockins.analysis.model;
 
 
-import java.util.List;
-
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 
 public interface SubstitutableObjectInfo {
@@ -13,10 +11,7 @@ public interface SubstitutableObjectInfo {
 
     boolean wasInitiallyGiven();
     boolean isValueChanged();
-    boolean isMock();
     
-    List<Stubbing> getStubbings();
-
     Object createValue();
     Object getCurrentValue();
 

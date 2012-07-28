@@ -5,8 +5,7 @@ import java.lang.reflect.Modifier;
 
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderFactory;
-import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
+import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
 
 
 public class MockValueProviderFactory implements ValueProviderFactory {
@@ -24,27 +23,5 @@ public class MockValueProviderFactory implements ValueProviderFactory {
         // every class that is not final...
         return (clazz.getModifiers() & Modifier.FINAL) == 0;
     }
-
-    static class MockValueProvider implements ValueProvider<Object> {
-        private MockHelper mockHelper = MockHelperHolder.getMockHelper();
-
-        private final Class<?> clazz;
-
-        public MockValueProvider(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        public Object createValue() {
-            Object mock = mockHelper.createMock(clazz);
-            return mock;
-        }
-
-        public String code() {
-            return mockHelper.createMockCode(clazz);
-        }
-
-        public boolean isMocking() {
-            return true;
-        }
-    }    
+    
 }
