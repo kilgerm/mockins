@@ -2,9 +2,7 @@ package net.kilger.mockins.generator.valueprovider.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.kilger.mockins.analysis.model.Stubbing;
@@ -95,35 +93,7 @@ public class MockValueProvider implements ValueProvider<Object> {
     }
 
     private boolean shouldBeStubbed(Method method) {
-        return needsToBeStubbed(method) && canBeStubbed(method);
-    }
-
-    private boolean needsToBeStubbed(Method method) {
-        Class<?> returnType = method.getReturnType();
-
-        if (returnType.equals(Void.TYPE)) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-
-        if (returnType.isPrimitive()) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-        
-        return true;
-    }
-
-    private boolean canBeStubbed(Method method) {
-        if (Modifier.isFinal(method.getModifiers())) {
-            return false; // FIXME: this is actually up to the mocking implementation to decide!
-        }
-
-        // FIXME: rather getDeclaringClass() not Object?
-        List<String> disallowed = Arrays.asList("equals", "hashCode", "getClass", "toString");
-        if (disallowed.contains(method.getName())) {
-            return false;
-        }
-        
-        return true;
+        return mockHelper.needsToBeStubbed(method) && mockHelper.canBeStubbed(method);
     }
 
     public void removeUneccesaryStubbings(RetryCallback retryCallback) {

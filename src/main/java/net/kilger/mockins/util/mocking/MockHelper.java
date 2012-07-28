@@ -1,6 +1,7 @@
 package net.kilger.mockins.util.mocking;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import net.kilger.mockins.analysis.model.Stubbing;
 
@@ -20,5 +21,8 @@ public interface MockHelper {
 
     <T> T createMock(Class<T> clazz);
     String createMockCode(Class<?> clazz);
+
+    boolean needsToBeStubbed(Method method);
+    boolean canBeStubbed(Method method);
 
 }
