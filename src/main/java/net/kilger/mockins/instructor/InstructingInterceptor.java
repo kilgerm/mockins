@@ -9,7 +9,7 @@ import net.kilger.mockins.handler.NpeHandler;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class InstructorInterceptor<T> implements MethodInterceptor {
+public class InstructingInterceptor<T> implements MethodInterceptor {
     
     private static final String MOCKINS_RESULT_HEADER = 
             "//============================================================================\n" +
@@ -19,7 +19,7 @@ public class InstructorInterceptor<T> implements MethodInterceptor {
     
     private final T originalObject;
 
-    public InstructorInterceptor(T originalObject) {
+    public InstructingInterceptor(T originalObject) {
         this.originalObject = originalObject;
     }
 

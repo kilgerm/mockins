@@ -7,7 +7,7 @@ import java.util.List;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.GivenValueProvider;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 
 public abstract class BaseSubstitutableObjectInfo implements SubstitutableObjectInfo {

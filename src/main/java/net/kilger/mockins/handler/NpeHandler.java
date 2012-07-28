@@ -26,7 +26,7 @@ import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
 import net.kilger.mockins.util.ReflectionUtil;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 
 public class NpeHandler {

@@ -10,7 +10,7 @@ public class InstructorFactory {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
         enhancer.setInterfaces(new Class<?>[] { Instructor.class });
-        enhancer.setCallback(new InstructorInterceptor<T>(classToEnhanceWithInstructor));
+        enhancer.setCallback(new InstructingInterceptor<T>(classToEnhanceWithInstructor));
         return (T) enhancer.create();
     }
 }

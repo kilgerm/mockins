@@ -1,4 +1,4 @@
-package net.kilger.mockins.util.mocking;
+package net.kilger.mockins.util.mocking.impl;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.GivenValueProvider;
+import net.kilger.mockins.util.mocking.MockitoHelper;
 
 import org.junit.Test;
 import org.mockito.Mockito;

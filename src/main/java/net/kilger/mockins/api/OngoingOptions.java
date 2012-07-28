@@ -1,8 +1,8 @@
-package net.kilger.mockins;
+package net.kilger.mockins.api;
 
-import net.kilger.mockins.util.mocking.EasyMockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
 import net.kilger.mockins.util.mocking.MockitoHelper;
+import net.kilger.mockins.util.mocking.impl.EasyMockHelper;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class OngoingOptions {
 

@@ -1,5 +1,6 @@
 package net.kilger.mockins;
 
+import net.kilger.mockins.api.OngoingOptions;
 import net.kilger.mockins.instructor.InstructorFactory;
 
 /**

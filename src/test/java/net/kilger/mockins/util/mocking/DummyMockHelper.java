@@ -11,6 +11,7 @@ import net.kilger.mockins.generator.valueprovider.factory.PrimitiveValueProvider
 import net.kilger.mockins.generator.valueprovider.impl.FixedValueProvider;
 import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.SimpleClassNamer;
+import net.kilger.mockins.util.mocking.impl.BaseMockHelper;
 import net.sf.cglib.core.DefaultNamingPolicy;
 import net.sf.cglib.core.Predicate;
 import net.sf.cglib.proxy.Enhancer;

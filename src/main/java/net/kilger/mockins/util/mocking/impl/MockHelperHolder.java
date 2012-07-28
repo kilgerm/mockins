@@ -1,4 +1,7 @@
-package net.kilger.mockins.util.mocking;
+package net.kilger.mockins.util.mocking.impl;
+
+import net.kilger.mockins.util.mocking.MockHelper;
+import net.kilger.mockins.util.mocking.MockitoHelper;
 
 public final class MockHelperHolder {
 

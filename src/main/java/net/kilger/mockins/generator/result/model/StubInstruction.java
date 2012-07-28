@@ -2,7 +2,7 @@ package net.kilger.mockins.generator.result.model;
 
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class StubInstruction implements Instruction {
 

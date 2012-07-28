@@ -13,7 +13,7 @@ import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.handler.NpeHandler;
 import net.kilger.mockins.util.MethodByNameComparator;
 import net.kilger.mockins.util.mocking.DummyMockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

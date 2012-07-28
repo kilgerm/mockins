@@ -3,7 +3,7 @@ package net.kilger.mockins.generator.result.model;
 import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.ClassNamerHolder;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.MockHelperHolder;
+import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class CreateParameterMockInstruction extends CompositeInstruction {
 
