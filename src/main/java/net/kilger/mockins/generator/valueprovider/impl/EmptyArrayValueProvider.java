@@ -7,7 +7,7 @@ import java.util.List;
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.util.ClassNamer;
-import net.kilger.mockins.util.ClassNamerHolder;
+import net.kilger.mockins.util.MockinsContext;
 
 /**
  * Provides empty arrays (of primitives or arbitrary class objects).
@@ -16,7 +16,7 @@ import net.kilger.mockins.util.ClassNamerHolder;
 public class EmptyArrayValueProvider implements ValueProvider<Object> {
 
     private final Class<?> clazz;
-    private ClassNamer classNamer = ClassNamerHolder.getClassNamer();
+    private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
 
     public EmptyArrayValueProvider(Class<?> clazz) {
         this.clazz = clazz;

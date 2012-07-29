@@ -13,13 +13,13 @@ import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.handler.RetryCallback;
 import net.kilger.mockins.handler.RetryCallback.Result;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.ReflectionUtil;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class MockValueProvider implements ValueProvider<Object> {
     
-    private MockHelper mockHelper = MockHelperHolder.getMockHelper();
+    private MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
 
     private final Class<?> clazz;
 

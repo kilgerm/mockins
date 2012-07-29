@@ -12,8 +12,8 @@ import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.handler.NpeHandler;
 import net.kilger.mockins.util.MethodByNameComparator;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.DummyMockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -105,7 +105,7 @@ public class NpeHandlerTest {
 
     @BeforeClass
     public static void useDummyMockHelper() {
-        MockHelperHolder.setMockHelper(new DummyMockHelper());
+        MockinsContext.INSTANCE.setMockHelper(new DummyMockHelper());
     }
     
     @Test

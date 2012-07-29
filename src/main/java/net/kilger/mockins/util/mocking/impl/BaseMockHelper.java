@@ -8,13 +8,13 @@ import java.util.List;
 
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.util.ClassNamer;
-import net.kilger.mockins.util.ClassNamerHolder;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
 
 public abstract class BaseMockHelper implements MockHelper {
 
     protected abstract Object argMatcherAny(Class<?> clazz);
-    private ClassNamer classNamer = ClassNamerHolder.getClassNamer();
+    private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
 
     /**
      * List of methods that cannot be mocked.

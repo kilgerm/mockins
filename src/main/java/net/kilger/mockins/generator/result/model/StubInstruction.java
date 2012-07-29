@@ -1,14 +1,14 @@
 package net.kilger.mockins.generator.result.model;
 
 import net.kilger.mockins.analysis.model.Stubbing;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class StubInstruction implements Instruction {
 
     private final String mockName;
     private final Stubbing stubbing;
-    private MockHelper mockHelper = MockHelperHolder.getMockHelper();
+    private MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
 
     public StubInstruction(String mockName, Stubbing stubbing) {
         this.mockName = mockName;

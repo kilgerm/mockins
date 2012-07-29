@@ -6,14 +6,14 @@ import java.util.List;
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.util.ClassNamer;
-import net.kilger.mockins.util.ClassNamerHolder;
+import net.kilger.mockins.util.MockinsContext;
 
 public class EnumValueProvider implements ValueProvider<Object> {
 
     private final Class<?> clazz;
     private Object defaultValue;
     
-    private ClassNamer classNamer = ClassNamerHolder.getClassNamer();
+    private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
 
     public EnumValueProvider(Class<?> clazz) {
         this.clazz = clazz;

@@ -6,7 +6,7 @@ import java.util.List;
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.util.ClassNamer;
-import net.kilger.mockins.util.ClassNamerHolder;
+import net.kilger.mockins.util.MockinsContext;
 
 
 /**
@@ -19,7 +19,7 @@ public class NewInstanceValueProvider implements ValueProvider<Object> {
 
     private final Class<?> clazz;
     
-    private ClassNamer classNamer = ClassNamerHolder.getClassNamer();
+    private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
 
     public NewInstanceValueProvider(Class<?> clazz) throws InstantiationException, IllegalAccessException {
         this.clazz = clazz;

@@ -1,9 +1,8 @@
 package net.kilger.mockins.generator.result.model;
 
 import net.kilger.mockins.util.ClassNamer;
-import net.kilger.mockins.util.ClassNamerHolder;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 public class CreateParameterMockInstruction extends CompositeInstruction {
 
@@ -11,8 +10,8 @@ public class CreateParameterMockInstruction extends CompositeInstruction {
     private final String valueCreationCode;
     private final Class<?> type;
 
-    private MockHelper mockHelper = MockHelperHolder.getMockHelper();
-    private ClassNamer classNamer = ClassNamerHolder.getClassNamer();
+    private MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
+    private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
     
     public CreateParameterMockInstruction(String targetName, Class<?> type, String valueCreationCode) {
         this.targetName = targetName;

@@ -6,8 +6,8 @@ import java.util.List;
 
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.GivenValueProvider;
+import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
-import net.kilger.mockins.util.mocking.impl.MockHelperHolder;
 
 
 public abstract class BaseSubstitutableObjectInfo implements SubstitutableObjectInfo {
@@ -18,7 +18,7 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
 
     protected final List<Stubbing> stubbings = new ArrayList<Stubbing>();
 
-    protected MockHelper mockHelper = MockHelperHolder.getMockHelper();
+    protected MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
     protected final Class<?> type;
 
     public BaseSubstitutableObjectInfo(Object initialValue, Class<?> type) {
