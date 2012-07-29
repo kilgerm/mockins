@@ -70,7 +70,7 @@ public class MockValueProvider implements ValueProvider<Object> {
          * Note that these *might* not be accessible from the client,
          * but we don't know at this point...
          */
-        Method[] methods = new ReflectionUtil(clazz).getAllMethods().toArray(new Method[] {});
+        List<Method> methods = new ReflectionUtil(clazz).getAllMethods();
         
         for (Method method : methods) {
 
