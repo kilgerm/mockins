@@ -26,6 +26,11 @@ public class InstructingInterceptor<T> implements MethodInterceptor {
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
         Object result = null;
         try {
+            /* 
+             * bypassing accessibility is in fact needed in case 
+             * the method belongs to a superclass of the instance class.
+             */
+            method.setAccessible(true);
             result = method.invoke(originalObject, args);
             
         } catch (InvocationTargetException ite) {
