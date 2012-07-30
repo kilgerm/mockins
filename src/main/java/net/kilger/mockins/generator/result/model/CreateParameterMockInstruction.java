@@ -4,6 +4,8 @@ import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
 
+import org.apache.commons.lang.StringUtils;
+
 public class CreateParameterMockInstruction extends CompositeInstruction {
 
     private final String targetName;
@@ -29,7 +31,7 @@ public class CreateParameterMockInstruction extends CompositeInstruction {
         message.append(super.message());
         
         String prepareMockCode = mockHelper.prepareMockCode(targetName);
-        if (!prepareMockCode.isEmpty()) {
+        if (!StringUtils.isEmpty(prepareMockCode)) {
             message.append(prepareMockCode).append(";\n");
         }
         
