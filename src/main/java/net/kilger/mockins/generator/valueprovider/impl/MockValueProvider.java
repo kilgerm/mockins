@@ -15,7 +15,7 @@ import net.kilger.mockins.handler.RetryCallback;
 import net.kilger.mockins.handler.RetryCallback.Result;
 import net.kilger.mockins.instructor.LocalVariableInstruction;
 import net.kilger.mockins.util.MockinsContext;
-import net.kilger.mockins.util.ReflectionUtil;
+import net.kilger.mockins.util.impl.ReflectionUtil;
 import net.kilger.mockins.util.mocking.MockHelper;
 
 public class MockValueProvider implements ValueProvider<Object> {

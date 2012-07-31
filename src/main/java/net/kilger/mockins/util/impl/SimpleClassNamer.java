@@ -1,4 +1,6 @@
-package net.kilger.mockins.util;
+package net.kilger.mockins.util.impl;
+
+import net.kilger.mockins.util.ClassNamer;
 
 public class SimpleClassNamer implements ClassNamer {
 

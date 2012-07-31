@@ -1,6 +1,8 @@
-package net.kilger.mockins.util;
+package net.kilger.mockins.util.impl;
 
 import static org.junit.Assert.*;
+
+import net.kilger.mockins.util.impl.SimpleClassNamer;
 
 import org.junit.Test;
 

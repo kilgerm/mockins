@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.kilger.mockins.generator.result.InstructionAssert;
-import net.kilger.mockins.generator.result.InstructionAssert.InstructionMatcher;
 import net.kilger.mockins.generator.result.InstructionTreeWalker;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;

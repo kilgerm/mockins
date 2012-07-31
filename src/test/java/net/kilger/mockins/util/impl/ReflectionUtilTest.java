@@ -1,4 +1,4 @@
-package net.kilger.mockins.util;
+package net.kilger.mockins.util.impl;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import net.kilger.mockins.util.MethodByNameComparator;
 
 import org.junit.Test;
 import org.mockito.Mockito;

@@ -1,4 +1,4 @@
-package net.kilger.mockins.util;
+package net.kilger.mockins.util.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

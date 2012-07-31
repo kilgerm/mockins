@@ -1,5 +1,6 @@
 package net.kilger.mockins.util;
 
+import net.kilger.mockins.util.impl.SimpleClassNamer;
 import net.kilger.mockins.util.impl.SimpleLocalVarNamer;
 import net.kilger.mockins.util.mocking.MockHelper;
 import net.kilger.mockins.util.mocking.MockitoHelper;
