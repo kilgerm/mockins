@@ -36,6 +36,9 @@ public class NpeHandler implements RetryCallback {
     private List<ParamInfo> paramInfos;
     private List<FieldInfo> fieldInfos;
 
+    /** the maximum number of levels where to stub - use with caution */
+    int maxStubLevel = 2;
+
     public NpeHandler(Object classUnderTest, Method method, Object[] initialArgs) {
         this.classUnderTest = classUnderTest;
         this.method = method;
@@ -69,26 +72,34 @@ public class NpeHandler implements RetryCallback {
 
         LOG.info("still npe after subst params and fields");
 
-        createAllStubbingsForParams();
-        createAllStubbingsForFields();
+        int stubLevel = 1;
 
-        retry();
-        if (!hasNpe) {
-            LOG.info("ok now after stubbing all");
-            verifyAllStubsReproducable();
+        do {
+            LOG.info("stub all level " + stubLevel);
+            createAllStubbingsForParams(stubLevel);
+            createAllStubbingsForFields(stubLevel);
 
-            LOG.debug("removing unneccessary params and fields");
-            removeNullableParams();
-            removeNullableFields();
+            retry();
+            if (!hasNpe) {
+                LOG.info("ok now after stubbing all");
+                verifyAllStubsReproducable();
+
+                LOG.debug("removing unneccessary params and fields");
+                removeNullableParams();
+                removeNullableFields();
+
+                LOG.debug("removing unneccessary stubs for params and fields");
+                removeUnneccesaryStubbingsForParams();
+                removeUnneccesaryStubbingsForFields();
+
+                return resultInstruction();
+            }
             
-            LOG.debug("removing unneccessary stubs for params and fields");
-            removeUnneccesaryStubbingsForParams();
-            removeUnneccesaryStubbingsForFields();
-            
-            return resultInstruction();
-        }
+            LOG.info("still NPE after stub of level " + stubLevel);
+            stubLevel++;
+        } while (stubLevel <= maxStubLevel);
 
-        LOG.error("stubbed all, still NPE - nothing we can do...");
+        LOG.error("stubbed all up to level " + stubLevel + " but still NPE - nothing we can do...");
         throw latestNpe;
     }
 
@@ -164,20 +175,20 @@ public class NpeHandler implements RetryCallback {
         }
     }
 
-    private void createAllStubbingsForParams() {
-        createAllStubbingsFor(paramInfos);
+    private void createAllStubbingsForParams(int maxStubLevel) {
+        createAllStubbingsFor(paramInfos, maxStubLevel);
     }
     
-    private void createAllStubbingsForFields() {
-        createAllStubbingsFor(fieldInfos);
+    private void createAllStubbingsForFields(int maxStubLevel) {
+        createAllStubbingsFor(fieldInfos, maxStubLevel);
     }
 
-    private void createAllStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
+    private void createAllStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos, int maxStubLevel) {
         for (SubstitutableObjectInfo substitutable : substitutableObjectInfos) {
 
             if (substitutable.getValueProvider() instanceof MockValueProvider) {
                 MockValueProvider vp = (MockValueProvider) substitutable.getValueProvider();
-                vp.addAllStubs();
+                vp.addAllStubs(maxStubLevel);
                 
             } else {
                 LOG.debug(substitutable.getDisplayName() + " skip " + substitutable.getCurrentValue());

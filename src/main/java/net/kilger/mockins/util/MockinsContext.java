@@ -1,5 +1,6 @@
 package net.kilger.mockins.util;
 
+import net.kilger.mockins.util.impl.SimpleLocalVarNamer;
 import net.kilger.mockins.util.mocking.MockHelper;
 import net.kilger.mockins.util.mocking.MockitoHelper;
 import net.kilger.mockins.util.mocking.impl.EasyMockHelper;
@@ -16,6 +17,7 @@ public enum MockinsContext {
     private MockHelper mockHelper = null;
 
     private ClassNamer classNamer = defaultClassNamer();
+    private LocalVarNamer localVarNamer = defaultLocalVarNamer();
 
     /**
      * Returns the current mockhelper, autodetecting which one to use
@@ -84,7 +86,20 @@ public enum MockinsContext {
         INSTANCE.classNamer = classNamer;
     }
 
+    public LocalVarNamer getLocalVarNamer() {
+        return localVarNamer;
+    }
+
+    public void setLocalVarNamer(LocalVarNamer localVarNamer) {
+        INSTANCE.localVarNamer = localVarNamer;
+    }
+    
     private static ClassNamer defaultClassNamer() {
         return new SimpleClassNamer();
     }
+
+    private LocalVarNamer defaultLocalVarNamer() {
+        return new SimpleLocalVarNamer();
+    }
+
 }

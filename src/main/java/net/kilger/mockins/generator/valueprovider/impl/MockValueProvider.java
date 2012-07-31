@@ -13,6 +13,7 @@ import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.handler.RetryCallback;
 import net.kilger.mockins.handler.RetryCallback.Result;
+import net.kilger.mockins.instructor.LocalVariableInstruction;
 import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.ReflectionUtil;
 import net.kilger.mockins.util.mocking.MockHelper;
@@ -62,7 +63,7 @@ public class MockValueProvider implements ValueProvider<Object> {
         return stubbings;
     }
 
-    public void addAllStubs() {
+    public void addAllStubs(int levelsOfStubbing) {
         LOG.debug("all add stubs");
 
         /* 
@@ -85,6 +86,11 @@ public class MockValueProvider implements ValueProvider<Object> {
             LOG.debug("  stub " + method + " with " + methodParamCount + " params and returntype " + returnType);
 
             ValueProvider<?> vp = ValueProviderRegistry.providerFor(returnType);
+            if ((levelsOfStubbing > 1) && (vp instanceof MockValueProvider)) {
+                // we need to go deeper
+                MockValueProvider mvp = (MockValueProvider) vp;
+                mvp.addAllStubs(levelsOfStubbing - 1);
+            }
 
             Stubbing stubbing = new Stubbing(method, vp, methodParamTypes);
             stubbings.add(stubbing);
@@ -107,6 +113,12 @@ public class MockValueProvider implements ValueProvider<Object> {
             else {
                 LOG.debug("required: " + stubbingToTest);
                 stubbings.set(j, stubbingToTest);
+
+                LOG.debug("recursive stubbings");
+                if (stubbingToTest.getValueProvider() instanceof MockValueProvider) {
+                    MockValueProvider mvp = (MockValueProvider) stubbingToTest.getValueProvider();
+                    mvp.removeUneccesaryStubbings(retryCallback);
+                }
             }
         }
     }
@@ -116,7 +128,37 @@ public class MockValueProvider implements ValueProvider<Object> {
             if (stubbing.isEmpty()) {
                 continue;
             }
-            StubInstruction stubInstruction = new StubInstruction(targetName, stubbing);
+
+            boolean needLocalVar = false;
+            ValueProvider<?> vp = stubbing.getValueProvider();
+            if (vp instanceof MockValueProvider) {
+                MockValueProvider mvp = (MockValueProvider) vp;
+                if (!mvp.getStubbings().isEmpty()) {
+                    // gonna need a local var, since the mock returned also will have stubs
+                    needLocalVar = true;                    
+                }
+                // FIXME: add output of recursive mocks here
+            }
+            
+            Stubbing stubbingToUse;
+            if (needLocalVar) {
+                LocalVariableInstruction lvi = new LocalVariableInstruction(stubbing.getMethod().getReturnType(), stubbing.getValueProvider());
+                createMockInstruction.addComponent(lvi);
+                
+                if (vp instanceof MockValueProvider) {
+                    MockValueProvider mvp = (MockValueProvider) vp;
+                    mvp.addStubbingInstructions(createMockInstruction, lvi.getLocalVarName());
+                }
+                
+                ValueProvider<?> vpx = new FixedValueProvider(null /*unused*/, lvi.getLocalVarName());
+                stubbingToUse = new Stubbing(stubbing.getMethod(), vpx, stubbing.getMethodParamTypes());
+            }
+            else {
+                stubbingToUse = stubbing;
+            }
+            
+            StubInstruction stubInstruction = new StubInstruction(targetName, stubbingToUse);
+            
             createMockInstruction.addComponent(stubInstruction);
         }
         

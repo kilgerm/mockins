@@ -1,4 +1,4 @@
-package net.kilger.mockins.generator;
+package net.kilger.mockins.handler;
 
 import static org.junit.Assert.*;
 
@@ -7,12 +7,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.kilger.mockins.generator.result.InstructionAssert;
+import net.kilger.mockins.generator.result.InstructionAssert.InstructionMatcher;
 import net.kilger.mockins.generator.result.InstructionTreeWalker;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
-import net.kilger.mockins.handler.NpeHandler;
+import net.kilger.mockins.util.LocalVarNamer;
 import net.kilger.mockins.util.MethodByNameComparator;
 import net.kilger.mockins.util.MockinsContext;
+import net.kilger.mockins.util.impl.SimpleLocalVarNamer;
 import net.kilger.mockins.util.mocking.DummyMockHelper;
 
 import org.junit.BeforeClass;
@@ -421,6 +424,198 @@ public class NpeHandlerTest {
                 }
             }
         }.walkThrough(instruction);
+    }
+
+    
+    public static class C2 {
+        public String getData() {
+            return null;
+        }
+    }
+    
+    public static class B4 {
+        public C2 getC2() {
+            return null;
+        }
+    }
+    
+    public static class A7 {
+        public void something(B4 arg0) {
+            System.out.println(arg0.getC2().getData().toString());
+        }
+    }
+    
+    @Test
+    public void testStubLevel2() throws SecurityException, NoSuchMethodException {
+        A7 obj = new A7();
+        
+        LocalVarNamer localVarNamer = new SimpleLocalVarNamer("x", 0);
+        MockinsContext.INSTANCE.setLocalVarNamer(localVarNamer);
+        
+        Method method = obj.getClass().getMethod("something", new Class<?>[] {B4.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        
+        Instruction instruction = classUnderTest.handle();
+        String result = instruction.toString();
+        System.err.println(result);
+        assertNotNull(instruction);
+        
+        assertHasMockAndStub(instruction, "param0", "getC2");
+        assertHasMockAndStub(instruction, "x0", "getData");
+    }
+
+    public static class A8 {
+        public void something(B4 arg0) {
+            System.out.println(arg0.getC2().toString());
+        }
+    }
+    
+    @Test
+    public void testStubLevel2onlyIfRequired() throws SecurityException, NoSuchMethodException {
+        A8 obj = new A8();
+        
+        LocalVarNamer localVarNamer = new SimpleLocalVarNamer("x", 0);
+        MockinsContext.INSTANCE.setLocalVarNamer(localVarNamer);
+        
+        Method method = obj.getClass().getMethod("something", new Class<?>[] {B4.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        
+        Instruction instruction = classUnderTest.handle();
+        String result = instruction.toString();
+        System.err.println(result);
+        assertNotNull(instruction);
+        
+        assertHasMockAndStub(instruction, "param0", "getC2");
+        assertNotHasStubForMethod(instruction, "getData");
+    }
+
+    public static class C3 {
+        public String getMoreData() {
+            return null;
+        }
+        public String getData() {
+            return null;
+        }
+    }
+    
+    public static class B5 {
+        public C3 getC3() {
+            return null;
+        }
+    }
+    
+    public static class A9 {
+        public void something(B5 arg0) {
+            System.out.println(arg0.getC3().getData().toString());
+        }
+    }
+    
+    @Test
+    public void testStubLevel2onlyRequiredMethods() throws SecurityException, NoSuchMethodException {
+        A9 obj = new A9();
+        
+        LocalVarNamer localVarNamer = new SimpleLocalVarNamer("x", 0);
+        MockinsContext.INSTANCE.setLocalVarNamer(localVarNamer);
+        
+        Method method = obj.getClass().getMethod("something", new Class<?>[] {B5.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        
+        Instruction instruction = classUnderTest.handle();
+        String result = instruction.toString();
+        System.err.println(result);
+        assertNotNull(instruction);
+        
+        assertHasMockAndStub(instruction, "param0", "getC3");
+        assertHasMockAndStub(instruction, "x0", "getData");
+        assertNotHasStubForMethod(instruction, "getMoreData");
+    }
+    
+    
+    public static class A10d {
+    }
+    
+    public static class A10c {
+        public A10d getA10d() {
+            return null;
+        }
+    }
+    
+    public static class A10b {
+        public A10c getA10c() {
+            return null;
+        }
+    }
+    
+    public static class A10a {
+        public A10b getA10b() {
+            return null;
+        }
+    }
+    
+    public static class A10 {
+        public void something(A10a arg0) {
+            System.out.println(arg0.getA10b().getA10c().getA10d().toString());
+        }
+    }
+    
+    @Test
+    public void testStubLevelNotSufficient() throws SecurityException, NoSuchMethodException {
+        A10 obj = new A10();
+        
+        LocalVarNamer localVarNamer = new SimpleLocalVarNamer("x", 0);
+        MockinsContext.INSTANCE.setLocalVarNamer(localVarNamer);
+        
+        Method method = obj.getClass().getMethod("something", new Class<?>[] {A10a.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        
+        try {
+            classUnderTest.maxStubLevel = 1;
+            classUnderTest.handle();
+        } catch(NullPointerException e) {
+            // that's fine - stubbing needs level >= 3            
+        }
+        try {
+            classUnderTest.maxStubLevel = 2;
+            classUnderTest.handle();
+        } catch(NullPointerException e) {
+            // that's fine - stubbing needs level >= 3            
+        }
+        
+        // with level 3, stubbing should work
+        classUnderTest.maxStubLevel = 3;
+        Instruction instruction = classUnderTest.handle();
+        assertNotNull(instruction);
+    }
+    
+    private void assertNotHasStubForMethod(Instruction instruction, final String methodName) {
+        InstructionAssert.assertHasNoInstruction(instruction, new InstructionAssert.InstructionMatcher() {
+
+            public boolean matches(Instruction instruction) {
+                if (!(instruction instanceof StubInstruction)) {
+                    return false;
+                }
+                StubInstruction stubInstruction = (StubInstruction) instruction;
+                return stubInstruction.getStubbing().getMethod().getName().equals(methodName);
+            }
+            
+        });        
+    }
+
+    private void assertHasMockAndStub(Instruction instruction, final String mockName, final String stubMethodName) {
+        InstructionAssert.assertHasInstruction(instruction, new InstructionAssert.InstructionMatcher() {
+            public boolean matches(Instruction instruction) {
+                if (!(instruction instanceof StubInstruction)) {
+                    return false;
+                }
+                StubInstruction stubInstruction = (StubInstruction) instruction;
+                return mockName.equals(stubInstruction.getMockName()) && 
+                       stubMethodName.equals(stubInstruction.getStubbing().getMethod().getName());
+            }
+        });
     }
     
     
