@@ -4,7 +4,7 @@
 	<groupId>net.kilger.mockins</groupId>
 	<artifactId>mockins-sample1</artifactId>
 	<packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     
     <description>Sample for Mockins</description>
     
