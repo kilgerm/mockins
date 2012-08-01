@@ -4,20 +4,21 @@ import net.kilger.mockins.api.OngoingOptions;
 import net.kilger.mockins.instructor.InstructorFactory;
 
 /**
- * <p>This is the main API for Mockins.</p>
+ * <p>Mockins is a code generator for mock and stub code.</p>
  * <p>
  * Example:
  * <pre>
  * // This is the class you would like to test
  * MyClass classUnderTest = new MyClass();
  * 
- * // first, create an "instructed" wrapper
- * instructed = Mockins.instruct(classUnderTest);
+ * // first, create an "instructor" wrapper
+ * MyClass instructor = Mockins.instructor(classUnderTest);
  * 
  * // then call whatever method you would like to test...
- * instructed.testMethod(null);
+ * instructor.myMethod(null);
  * 
- * // ...this will run testMethod and try to add mocks/stubs for parameters and fields so that the method does not throw a NPE!
+ * // ...this will run myMethod and try to add mocks/stubs 
+ * for parameters and fields so that the method does not throw a NPE!
  * </pre>
  * <p>
  */

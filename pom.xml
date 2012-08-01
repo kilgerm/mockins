@@ -12,6 +12,7 @@
     
     <name>Mockins</name>
     <url>https://github.com/kilgerm/mockins</url>
+    <description>Mockins is a code generator for mock and stub code.</description>
     
     <scm>
         <developerConnection>git@github.com:kilgerm/mockins.git</developerConnection>
