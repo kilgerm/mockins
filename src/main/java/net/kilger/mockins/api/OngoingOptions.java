@@ -4,10 +4,15 @@ import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockitoHelper;
 import net.kilger.mockins.util.mocking.impl.EasyMockHelper;
 
+/**
+ * <p>
+ * API class for setting Mockins options.
+ * </p>
+ */
 public class OngoingOptions {
 
     /**
-     * Tells Mockins to use EasyMock mocking framework.
+     * Tells Mockins to use the EasyMock mocking framework.
      */
     public OngoingOptions useEasyMock() {
         MockinsContext.INSTANCE.setMockHelper(new EasyMockHelper());
