@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.kilger.mockins</groupId>
 	<artifactId>mockins</artifactId>
-	<version>0.2</version>
+	<version>0.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
     <!-- needed for Sonatype OSS repository https://oss.sonatype.org -->
