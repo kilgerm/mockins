@@ -21,7 +21,8 @@ public class MockValueProviderFactory implements ValueProviderFactory {
 
     public boolean canHandle(Class<?> clazz) {
         // every class that is not final...
-        return (clazz.getModifiers() & Modifier.FINAL) == 0;
+        // FIXME: this should actually be decided by the mocking framework
+        return !Modifier.isFinal(clazz.getModifiers());
     }
     
 }
