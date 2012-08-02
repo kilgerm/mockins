@@ -3,6 +3,9 @@ package net.kilger.mockins.generator.result.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generic instruction that consists of children instructions.
+ */
 public class CompositeInstruction implements Instruction {
 
     protected final List<Instruction> components = new ArrayList<Instruction>();

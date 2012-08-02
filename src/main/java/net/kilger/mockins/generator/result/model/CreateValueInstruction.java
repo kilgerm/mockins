@@ -3,7 +3,9 @@ package net.kilger.mockins.generator.result.model;
 import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.MockinsContext;
 
-
+/**
+ * Instruction for creating a value (not a mock)
+ */
 public class CreateValueInstruction implements Instruction {
 
     private final String targetName;

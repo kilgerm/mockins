@@ -4,6 +4,9 @@ import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.mocking.MockHelper;
 
+/**
+ * Instruction for applying a {@link Stubbing} to a mock.
+ */
 public class StubInstruction implements Instruction {
 
     private final String mockName;

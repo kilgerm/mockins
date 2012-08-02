@@ -6,6 +6,9 @@ import net.kilger.mockins.util.mocking.MockHelper;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * Instruction for creating a mock and passing it as a parameter.
+ */
 public class CreateParameterMockInstruction extends CompositeInstruction {
 
     private final String targetName;

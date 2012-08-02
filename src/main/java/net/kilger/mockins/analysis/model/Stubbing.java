@@ -8,6 +8,10 @@ import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
+/**
+ * Abstraction of a method that should be stubbed and 
+ * the valueProvider for creating a value to return.
+ */
 public class Stubbing {
 
     public static final Stubbing EMPTY = new Stubbing();
@@ -44,6 +48,7 @@ public class Stubbing {
         return method == null;
     }
     
+    @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
@@ -52,6 +57,7 @@ public class Stubbing {
         return valueProvider.createValue();
     }
     
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Stubbing) {
             Stubbing otherStubbing = (Stubbing) o;

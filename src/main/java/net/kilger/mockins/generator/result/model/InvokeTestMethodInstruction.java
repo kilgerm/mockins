@@ -5,7 +5,9 @@ import java.util.List;
 
 import net.kilger.mockins.analysis.model.ParamInfo;
 
-
+/**
+ * Instruction for invoking the method to be tested.
+ */
 public class InvokeTestMethodInstruction implements Instruction {
 
     private final String classUnderTestName;
