@@ -5,6 +5,13 @@
 	<artifactId>mockins</artifactId>
 	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
+
+    <!-- needed for sonatype oss repository -->
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,8 +22,9 @@
     <description>Mockins is a code generator for mock and stub code.</description>
     
     <scm>
-        <developerConnection>git@github.com:kilgerm/mockins.git</developerConnection>
-        <connection>git://github.com/kilgerm/mockins.git</connection>
+        <developerConnection>scm:git:git@github.com:kilgerm/mockins.git</developerConnection>
+        <connection>scm:git:git@github.com:kilgerm/mockins.git</connection>
+        <url>git@github.com:kilgerm/mockins.git</url>
     </scm>
     
     <licenses>
