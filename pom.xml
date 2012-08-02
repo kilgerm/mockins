@@ -6,7 +6,7 @@
 	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-    <!-- needed for sonatype oss repository -->
+    <!-- needed for Sonatype OSS repository https://oss.sonatype.org -->
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -18,7 +18,7 @@
 	</properties>
     
     <name>Mockins</name>
-    <url>https://github.com/kilgerm/mockins</url>
+    <url>https://github.com/kilgerm/mockins/wiki</url>
     <description>Mockins is a code generator for mock and stub code.</description>
     
     <scm>
