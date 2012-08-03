@@ -1,6 +1,9 @@
 package net.kilger.mockins;
 
+import java.lang.reflect.Method;
+
 import net.kilger.mockins.api.OngoingOptions;
+import net.kilger.mockins.generator.TestMethodGeneratorPrinter;
 import net.kilger.mockins.instructor.InstructorFactory;
 
 /**
@@ -39,6 +42,14 @@ public final class Mockins {
      */
     public static OngoingOptions option() {
         return new OngoingOptions();
+    }
+    
+    /**
+     * Generates a test method skeleton for the given method
+     * to be tested in the given class.
+     */
+    public static void generateTestSkeleton(Class<?> testedClass, Method testedMethod) {
+        new TestMethodGeneratorPrinter(testedClass, testedMethod).generateTestSkeletonAndPrint();
     }
 
     private Mockins() {
