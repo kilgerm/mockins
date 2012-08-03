@@ -1,6 +1,5 @@
-package net.kilger.mockins.instructor;
+package net.kilger.mockins.generator.result.model;
 
-import net.kilger.mockins.generator.result.model.CompositeInstruction;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.util.ClassNamer;
 import net.kilger.mockins.util.LocalVarNamer;

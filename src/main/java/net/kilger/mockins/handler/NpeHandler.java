@@ -279,6 +279,12 @@ public class NpeHandler implements RetryCallback {
     }
     
     private void init() {
+        /* 
+         * bypassing accessibility is in fact needed in case 
+         * the method belongs to a superclass of the instance class.
+         */
+        method.setAccessible(true);
+
         argLength = initialArgs.length;
         
         collectParamInfo();
