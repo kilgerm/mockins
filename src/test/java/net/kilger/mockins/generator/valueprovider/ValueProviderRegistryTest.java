@@ -167,6 +167,7 @@ public class ValueProviderRegistryTest {
         ValueProvider<?> vp = ValueProviderRegistry.providerFor(Map.class);
         Object value = vp.createValue();
         assertTrue(value instanceof Map);
+        @SuppressWarnings("unchecked")
         Map<A, A> map = (Map<A, A>) value;
         assertEquals(0, map.size());
         assertNotNull(map.keySet());
