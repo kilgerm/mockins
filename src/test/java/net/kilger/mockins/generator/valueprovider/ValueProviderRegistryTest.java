@@ -3,6 +3,12 @@ package net.kilger.mockins.generator.valueprovider;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.kilger.mockins.generator.valueprovider.impl.EmptyListValueProvider;
 
 import org.junit.Test;
 
@@ -139,4 +145,75 @@ public class ValueProviderRegistryTest {
         assertEquals(0, Array.getLength(value));
     }
     
+    @Test
+    public void testList() {
+        ValueProvider<?> vp = ValueProviderRegistry.providerFor(List.class);
+        Object value = vp.createValue();
+        assertTrue(value instanceof List);
+        @SuppressWarnings("unchecked")
+        List<A> list = (List<A>) value;
+        assertEquals(0, list.size());
+        assertNotNull(list.iterator());
+
+        // test that we can use it as a modifiable list
+        // with the element type we have in mind
+        A a = new A();
+        list.add(a);
+        assertTrue(list.contains(a));
+    }
+    
+    @Test
+    public void testMap() {
+        ValueProvider<?> vp = ValueProviderRegistry.providerFor(Map.class);
+        Object value = vp.createValue();
+        assertTrue(value instanceof Map);
+        Map<A, A> map = (Map<A, A>) value;
+        assertEquals(0, map.size());
+        assertNotNull(map.keySet());
+
+        // test that we can use it as a modifiable map
+        // with the element type we have in mind
+        A a = new A();
+        map.put(a, a);
+        assertTrue(map.containsKey(a));
+        assertTrue(map.containsValue(a));
+    }
+
+    @Test
+    public void testSet() {
+        ValueProvider<?> vp = ValueProviderRegistry.providerFor(Set.class);
+        Object value = vp.createValue();
+        assertTrue(value instanceof Set);
+        @SuppressWarnings("unchecked")
+        Set<A> set = (Set<A>) value;
+        assertEquals(0, set.size());
+        assertNotNull(set.iterator());
+
+        // test that we can use it as a modifiable set
+        // with the element type we have in mind
+        A a = new A();
+        set.add(a);
+        assertTrue(set.contains(a));
+
+        set.add(a);
+        assertEquals(1, set.size());
+    }
+    
+    @Test
+    public void testCollection() {
+        ValueProvider<?> vp = ValueProviderRegistry.providerFor(Collection.class);
+        Object value = vp.createValue();
+        assertTrue(vp instanceof EmptyListValueProvider);
+        assertTrue(value instanceof Collection);
+        @SuppressWarnings("unchecked")
+        Collection<A> collection = (Collection<A>) value;
+        assertEquals(0, collection.size());
+        assertNotNull(collection.iterator());
+
+        // test that we can use it as a modifiable list
+        // with the element type we have in mind
+        A a = new A();
+        collection.add(a);
+        assertTrue(collection.contains(a));
+    }
 }
