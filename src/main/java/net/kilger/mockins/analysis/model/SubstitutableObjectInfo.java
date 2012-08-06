@@ -18,4 +18,6 @@ public interface SubstitutableObjectInfo {
     void setValueProvider(ValueProvider<?> valueProvider);
     ValueProvider<?> getValueProvider();
 
+    boolean isField();
+
 }

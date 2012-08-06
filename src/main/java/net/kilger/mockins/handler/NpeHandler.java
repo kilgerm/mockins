@@ -11,13 +11,8 @@ import net.kilger.mockins.analysis.model.FieldInfo;
 import net.kilger.mockins.analysis.model.ParamInfo;
 import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
 import net.kilger.mockins.common.LOG;
-import net.kilger.mockins.generator.result.model.CompositeInstruction;
-import net.kilger.mockins.generator.result.model.CreateFieldMockInstruction;
-import net.kilger.mockins.generator.result.model.CreateParameterMockInstruction;
-import net.kilger.mockins.generator.result.model.CreateValueInstruction;
-import net.kilger.mockins.generator.result.model.GenericInstruction;
+import net.kilger.mockins.generator.MockStubInstructionBuilder;
 import net.kilger.mockins.generator.result.model.Instruction;
-import net.kilger.mockins.generator.result.model.InvokeTestMethodInstruction;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
@@ -32,6 +27,8 @@ public class NpeHandler implements RetryCallback {
     private boolean hasNpe;
     private int argLength;
     private NullPointerException latestNpe;
+    
+    private MockStubInstructionBuilder mockInstructionBuilder = new MockStubInstructionBuilder(); 
 
     private List<ParamInfo> paramInfos;
     private List<FieldInfo> fieldInfos;
@@ -104,50 +101,7 @@ public class NpeHandler implements RetryCallback {
     }
 
     private Instruction resultInstruction() {
-        GenericInstruction instruction = new GenericInstruction("// method call will succeed with the following mocks and stubbings:\n");
-        String classUnderTestName = "classUnderTest.";
-
-        for (FieldInfo fieldInfo : fieldInfos) {
-            String targetName = classUnderTestName + fieldInfo.getField().getName();
-            
-            if (fieldInfo.getValueProvider() instanceof MockValueProvider) {
-                MockValueProvider mvp = (MockValueProvider) fieldInfo.getValueProvider();
-
-                CompositeInstruction mockFieldInstruction = new CreateFieldMockInstruction(targetName, fieldInfo.getType(), fieldInfo.getValueProvider().code());
-
-                mvp.addStubbingInstructions(mockFieldInstruction, targetName);
-
-                instruction.addComponent(mockFieldInstruction);
-            }
-            else {
-                if (fieldInfo.isValueChanged()) {
-                    CreateValueInstruction createValueInstruction = new CreateValueInstruction(targetName, fieldInfo.getValueProvider().code(), fieldInfo.getType());
-                    instruction.addComponent(createValueInstruction);
-                }
-            }
-        }
-        
-        for (SubstitutableObjectInfo paramInfo : paramInfos) {
-            String paramName = paramInfo.getDisplayName();
-            
-            if (paramInfo.getValueProvider() instanceof MockValueProvider) {
-                MockValueProvider mvp = ((MockValueProvider) paramInfo.getValueProvider());
-
-                CreateParameterMockInstruction mockArgumentInstruction = new CreateParameterMockInstruction(paramName, paramInfo.getType(), paramInfo.getValueProvider().code());
-                
-                mvp.addStubbingInstructions(mockArgumentInstruction, paramName);
-                
-                instruction.addComponent(mockArgumentInstruction);
-            }
-            else {
-                // print parameter values even if unchanged
-                CreateValueInstruction createValueInstruction = new CreateValueInstruction(paramName, paramInfo.getValueProvider().code(), paramInfo.getType());
-                instruction.addComponent(createValueInstruction);
-            }
-        }
-        
-        instruction.addComponent(new InvokeTestMethodInstruction(classUnderTestName, method, paramInfos));
-        return instruction;
+        return mockInstructionBuilder.buildInstruction(fieldInfos, paramInfos, method);
     }
 
     private void removeUnneccesaryStubbingsForParams() {
@@ -306,7 +260,8 @@ public class NpeHandler implements RetryCallback {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
-                }
+                } 
+                // FIXME: where does the name of classUnderTest belong?
                 FieldInfo fieldInfo = new FieldInfo(candidateField, initialValue); 
                 fieldInfos.add(fieldInfo);
             }

@@ -7,21 +7,23 @@ import net.kilger.mockins.util.mocking.MockHelper;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * Instruction for creating a mock and passing it as a parameter.
+ * Instruction for creating a mock and adding stubs.
  */
-public class CreateParameterMockInstruction extends CompositeInstruction {
+public class CreateMockAndStubInstruction extends CompositeInstruction {
 
     private final String targetName;
     private final String valueCreationCode;
     private final Class<?> type;
-
+    private final boolean useLocalVariable;
+    
     private MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
     private ClassNamer classNamer = MockinsContext.INSTANCE.getClassNamer();
     
-    public CreateParameterMockInstruction(String targetName, Class<?> type, String valueCreationCode) {
+    public CreateMockAndStubInstruction(String targetName, Class<?> type, String valueCreationCode, boolean useLocalVariable) {
         this.targetName = targetName;
         this.type = type;
         this.valueCreationCode = valueCreationCode;
+        this.useLocalVariable = useLocalVariable;
     }
 
     @Override
@@ -42,7 +44,14 @@ public class CreateParameterMockInstruction extends CompositeInstruction {
     }
 
     protected String targetPrefix() {
-        return classNamer.className(type) + " ";
+        String targetPrefix;
+        if (useLocalVariable) {
+            targetPrefix = classNamer.className(type) + " ";
+        }
+        else {
+            targetPrefix = "";
+        }
+        return targetPrefix;
     }
 
     @Override

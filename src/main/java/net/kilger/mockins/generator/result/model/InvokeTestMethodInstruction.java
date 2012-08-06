@@ -23,6 +23,7 @@ public class InvokeTestMethodInstruction implements Instruction {
     public String message() {
         StringBuilder sb = new StringBuilder();
         sb.append(classUnderTestName);
+        sb.append(".");
         sb.append(method.getName());
         sb.append("(");
         boolean first = true;

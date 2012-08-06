@@ -7,7 +7,7 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 public class FieldInfo extends BaseSubstitutableObjectInfo {
 
     private final Field field;
-
+    
     public FieldInfo(Field field, Object initialValue) {
         super(initialValue, field.getType());
         this.field = field;
@@ -19,11 +19,16 @@ public class FieldInfo extends BaseSubstitutableObjectInfo {
 
     @Override
     public String getDisplayName() {
-        return "field " + field.getName();
+        return field.getName();
     }
 
+    @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    public boolean isField() {
+        return true;
     }
     
 }

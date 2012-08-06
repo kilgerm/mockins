@@ -20,8 +20,19 @@ public class ParamInfo extends BaseSubstitutableObjectInfo {
         return "param" + index;
     }
 
+    @Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
+    }
+    
+    // FIXME: temporary to allow common treatment of paramters/fields
+    @Override
+    public boolean isValueChanged() {
+        return true;
+    }
+
+    public boolean isField() {
+        return false;
     }
     
 }
