@@ -137,7 +137,6 @@ public class MockValueProvider implements ValueProvider<Object> {
                     // gonna need a local var, since the mock returned also will have stubs
                     needLocalVar = true;                    
                 }
-                // FIXME: add output of recursive mocks here
             }
             
             Stubbing stubbingToUse;

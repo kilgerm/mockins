@@ -73,7 +73,7 @@ public abstract class BaseSubstitutableObjectInfo implements SubstitutableObject
     }
 
     public boolean isValueChanged() {
-        // FIXME: not clear whether to use this "heuristic"
+        // TODO: just a heuristic for now...
         boolean usingGivenValue = (valueProvider instanceof GivenValueProvider) 
                 || (currentValue == null && initialValue == null);
         return !usingGivenValue;

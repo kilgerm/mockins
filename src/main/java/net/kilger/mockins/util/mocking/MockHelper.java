@@ -24,5 +24,6 @@ public interface MockHelper {
 
     boolean needsToBeStubbed(Method method);
     boolean canBeStubbed(Method method);
+    boolean canBeMocked(Class<?> clazz);
 
 }

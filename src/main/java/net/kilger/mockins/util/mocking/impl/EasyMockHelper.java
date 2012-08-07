@@ -104,8 +104,6 @@ public class EasyMockHelper extends BaseMockHelper {
         return "EasyMock.createMock(" + classLiteral(clazz) + ")";
     }
 
-    // FIXME: Test
-
     public String addStubCode(String mockName, Stubbing stubbing) {
         StringBuilder stubStatement = new StringBuilder();
 

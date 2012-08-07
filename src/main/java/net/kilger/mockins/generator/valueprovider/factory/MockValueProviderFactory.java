@@ -1,15 +1,17 @@
 package net.kilger.mockins.generator.valueprovider.factory;
 
 
-import java.lang.reflect.Modifier;
-
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderFactory;
 import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
+import net.kilger.mockins.util.MockinsContext;
+import net.kilger.mockins.util.mocking.MockHelper;
 
 
 public class MockValueProviderFactory implements ValueProviderFactory {
 
+    private MockHelper mockHelper = MockinsContext.INSTANCE.getMockHelper();
+    
     @SuppressWarnings("unchecked")
     public <T> ValueProvider<T> valueProvider(Class<T> clazz) {
         return (ValueProvider<T>) new MockValueProvider(clazz);
@@ -20,9 +22,7 @@ public class MockValueProviderFactory implements ValueProviderFactory {
     }
 
     public boolean canHandle(Class<?> clazz) {
-        // every class that is not final...
-        // FIXME: this should actually be decided by the mocking framework
-        return !Modifier.isFinal(clazz.getModifiers());
+        return mockHelper.canBeMocked(clazz);
     }
     
 }

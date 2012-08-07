@@ -25,9 +25,9 @@ public class ParamInfo extends BaseSubstitutableObjectInfo {
         return ReflectionToStringBuilder.toString(this);
     }
     
-    // FIXME: temporary to allow common treatment of paramters/fields
     @Override
     public boolean isValueChanged() {
+        // params are always considered "changed", so that they are displayed
         return true;
     }
 

@@ -1,8 +1,8 @@
 package net.kilger.mockins.api;
 
 import net.kilger.mockins.util.MockinsContext;
-import net.kilger.mockins.util.mocking.MockitoHelper;
 import net.kilger.mockins.util.mocking.impl.EasyMockHelper;
+import net.kilger.mockins.util.mocking.impl.MockitoHelper;
 
 /**
  * <p>

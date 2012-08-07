@@ -7,8 +7,8 @@ import java.lang.reflect.Method;
 
 import net.kilger.mockins.analysis.model.Stubbing;
 import net.kilger.mockins.generator.valueprovider.ValueProvider;
+import net.kilger.mockins.generator.valueprovider.impl.FixedValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.GivenValueProvider;
-import net.kilger.mockins.util.mocking.MockitoHelper;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -150,4 +150,30 @@ public class MockitoHelperTest {
         // again
         assertEquals(VALUE, mock.stringMethodWithOneArg(new Object()));
     }
+
+    
+    @Test
+    public void testAddStubCode() throws SecurityException, NoSuchMethodException {
+        String methodName = "voidMethodWithTwoArgs";
+        Method method = A.class.getMethod(methodName, String.class, Integer.TYPE);
+        
+        ValueProvider<?> valueProvider = new FixedValueProvider(null /*unused*/, "$CREATEVALUE");
+        Class<?>[] methodParamTypes = method.getParameterTypes();
+        Stubbing stubbing = new Stubbing(method, valueProvider, methodParamTypes);
+        
+        String code = classUnderTest.addStubCode("$MOCK", stubbing);
+        
+        String expected = "Mockito.when(" +
+                    "$MOCK."+methodName+"(" +
+                        "Mockito.any(String.class), Mockito.anyInt()" +
+                        ")" +
+                    ").thenReturn(" +
+                        "$CREATEVALUE" +
+                ")";
+        
+        assertEquals(expected, code);
+    }
+
 }
+
+

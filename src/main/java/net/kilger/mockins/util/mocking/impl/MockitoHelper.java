@@ -1,10 +1,9 @@
-package net.kilger.mockins.util.mocking;
+package net.kilger.mockins.util.mocking.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import net.kilger.mockins.analysis.model.Stubbing;
-import net.kilger.mockins.util.mocking.impl.BaseMockHelper;
 
 import org.mockito.Mockito;
 
@@ -103,7 +102,6 @@ public class MockitoHelper extends BaseMockHelper {
         return "Mockito.mock(" + classLiteral(clazz) + ")";
     }
 
-    // FIXME: Test
     public String addStubCode(String mockName, Stubbing stubbing) {
         StringBuilder stubStatement = new StringBuilder();
 

@@ -95,4 +95,9 @@ public abstract class BaseMockHelper implements MockHelper {
         return true;
     }
 
+    public boolean canBeMocked(Class<?> clazz) {
+        // every class that is not final...
+        return !Modifier.isFinal(clazz.getModifiers());
+    }
+
 }
