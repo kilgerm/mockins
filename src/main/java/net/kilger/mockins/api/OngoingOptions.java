@@ -26,5 +26,13 @@ public class OngoingOptions {
         MockinsContext.INSTANCE.setMockHelper(new MockitoHelper());
         return this;
     }
+    
+    /**
+     * Sets the timeout for single invocations of the test method.
+     */
+    public OngoingOptions withInvocationTimeout(int timeoutMillis) {
+        MockinsContext.INSTANCE.setInvocationTimeoutMillis(timeoutMillis);
+        return this;
+    }
 
 }

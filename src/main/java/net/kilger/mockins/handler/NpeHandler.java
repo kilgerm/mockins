@@ -6,6 +6,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import net.kilger.mockins.analysis.model.FieldInfo;
 import net.kilger.mockins.analysis.model.ParamInfo;
@@ -17,6 +20,7 @@ import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
+import net.kilger.mockins.util.MockinsContext;
 
 
 public class NpeHandler implements RetryCallback {
@@ -24,17 +28,25 @@ public class NpeHandler implements RetryCallback {
     private final Object classUnderTest;
     private final Method method;
     private final Object[] initialArgs;
-    private boolean hasNpe;
     private int argLength;
-    private NullPointerException latestNpe;
     
     private MockStubInstructionBuilder mockInstructionBuilder = new MockStubInstructionBuilder(); 
 
     private List<ParamInfo> paramInfos;
     private List<FieldInfo> fieldInfos;
 
+    private Throwable latestException;
+    
+    private boolean hasNpe;
+    private volatile boolean invocationCompletedWithoutError;
+    boolean timeoutHappened;
+    
+
     /** the maximum number of levels where to stub - use with caution */
     int maxStubLevel = 2;
+    
+    /** timeout for invocation of the method to test in milliseconds */
+    int invocationTimeoutMillis = MockinsContext.INSTANCE.getInvocationTimeoutMillis();
 
     public NpeHandler(Object classUnderTest, Method method, Object[] initialArgs) {
         this.classUnderTest = classUnderTest;
@@ -47,7 +59,7 @@ public class NpeHandler implements RetryCallback {
         init();
 
         retry();
-        if (!hasNpe) {
+        if (!isNpe()) {
             LOG.info("no npe - nothing to do");
             return null;
         }
@@ -57,7 +69,7 @@ public class NpeHandler implements RetryCallback {
         fillAllFields();
 
         retry();
-        if (!hasNpe) {
+        if (!isNpe()) {
             LOG.info("no npe after subst params and fields");
 
             LOG.info("removing unneccessary params and fields");
@@ -77,7 +89,7 @@ public class NpeHandler implements RetryCallback {
             createAllStubbingsForFields(stubLevel);
 
             retry();
-            if (!hasNpe) {
+            if (!isNpe()) {
                 LOG.info("ok now after stubbing all");
                 verifyAllStubsReproducable();
 
@@ -96,8 +108,31 @@ public class NpeHandler implements RetryCallback {
             stubLevel++;
         } while (stubLevel <= maxStubLevel);
 
-        LOG.error("stubbed all up to level " + stubLevel + " but still NPE - nothing we can do...");
-        throw latestNpe;
+        
+        // if still exception: throw latest exception
+        if (latestException != null) {
+            LOG.error("stubbed all up to level " + stubLevel + " but still exception - nothing we can do...");
+            
+            if (latestException instanceof RuntimeException) {
+                throw (RuntimeException) latestException;
+            }
+            else {
+                // if no RuntimeException, wrap it first
+                // TODO: this is questionable. but do we want "throws Throwable" as signature?
+                throw new RuntimeException(latestException);
+            }
+        }
+        else {
+            // otherwise: log problem and return null
+            
+            if (timeoutHappened) {
+                LOG.error("last invokation of test method did not return before timeout");
+            }
+            else {
+                LOG.error("mocking/stubbing failed due to other reasons");
+            }
+            return null;
+        }
     }
 
     private Instruction resultInstruction() {
@@ -124,7 +159,7 @@ public class NpeHandler implements RetryCallback {
 
     private void verifyAllStubsReproducable() throws AssertionError {
         retry();
-        if (hasNpe) {
+        if (isNpe()) {
             throw new AssertionError("something went wrong");
         }
     }
@@ -173,7 +208,7 @@ public class NpeHandler implements RetryCallback {
             
             retry();
             
-            if (hasNpe) {
+            if (isNpe()) {
                 LOG.debug(displayName + ": may not be null");
                 substitutable.setValueProvider(originalVp);
             }
@@ -187,7 +222,7 @@ public class NpeHandler implements RetryCallback {
         buildCurrentValues();
         insertFields();
         retryInvocation();
-        return new Result(hasNpe);
+        return new Result(isNpe());
     }
 
     private void buildCurrentValues() {
@@ -261,7 +296,6 @@ public class NpeHandler implements RetryCallback {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } 
-                // FIXME: where does the name of classUnderTest belong?
                 FieldInfo fieldInfo = new FieldInfo(candidateField, initialValue); 
                 fieldInfos.add(fieldInfo);
             }
@@ -286,25 +320,65 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void retryInvocation() {
-        Object[] currentArgs = determineCurrentArgs();
-        hasNpe = false;
-        latestNpe = null;
+        final Object[] currentArgs = determineCurrentArgs();
         
-        try {
-            method.invoke(classUnderTest, currentArgs);
-            
-        } catch (InvocationTargetException ite) {
-            Throwable cause = ite.getCause();
-            if (cause instanceof NullPointerException) {
-                latestNpe = (NullPointerException) cause;
-                hasNpe = true;
-            }
+        resetStatusFlags();
 
-        } catch (IllegalArgumentException e) {
-            throw new Error("internal error: method parameter mismatch", e);
-        } catch (IllegalAccessException e) {
-            throw new Error("internal error: method not accessible", e);
+        retryInvocationWithTimeout(currentArgs);
+    }
+
+    private void retryInvocationWithTimeout(final Object[] currentArgs) throws Error {
+        ExecutorService xs = Executors.newSingleThreadExecutor();
+        xs.submit(methodInvokator(currentArgs));
+        
+        xs.shutdown();
+        try {
+            timeoutHappened = !xs.awaitTermination(invocationTimeoutMillis, TimeUnit.MILLISECONDS);
+
+            if (timeoutHappened) {
+                LOG.debug("timeout while method invocation - assuming non-termination");
+            }
+            
+            if (invocationCompletedWithoutError) {
+                LOG.debug("invocation completed without error");
+                hasNpe = false;
+                latestException = null;                
+            }
+            
+        } catch (InterruptedException e) {
+            // this should not happen normally
+            throw new Error("interrupted while invoking method", e);
         }
+    }
+
+    private void resetStatusFlags() {
+        hasNpe = false;
+        timeoutHappened = false;
+        latestException = null;
+        invocationCompletedWithoutError = false;
+    }
+
+    private Runnable methodInvokator(final Object[] currentArgs) {
+        return new Runnable() {
+            public void run() {
+                try {
+                    method.invoke(classUnderTest, currentArgs);
+                    invocationCompletedWithoutError = true;
+                }
+                catch (InvocationTargetException ite) {
+                    Throwable cause = ite.getCause();
+                    latestException = cause;
+                    if (cause instanceof NullPointerException) {
+                        hasNpe = true;
+                    }
+
+                } catch (IllegalArgumentException e) {
+                    throw new Error("internal error: method parameter mismatch", e);
+                } catch (IllegalAccessException e) {
+                    throw new Error("internal error: method not accessible", e);
+                }
+            }
+        };
     }
 
     private Object[] determineCurrentArgs() {
@@ -313,6 +387,11 @@ public class NpeHandler implements RetryCallback {
             currentArgs[paramInfo.getIndex()] = paramInfo.getCurrentValue();
         }
         return currentArgs;
+    }
+
+    public boolean isNpe() {
+        // timeout needs to be treated as "potentially npe"
+        return hasNpe || timeoutHappened;
     }
 
 }

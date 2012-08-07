@@ -590,6 +590,34 @@ public class NpeHandlerTest {
         assertNotNull(instruction);
     }
     
+    static class ClassWithNotReturningMethod {
+        public void notReturning(String arg0) {
+            System.out.println(arg0.toString());
+            // only gets here if arg0 is not null
+            while (arg0 != null) {
+                // infinity loop 
+            }
+        }
+    }
+    
+    @Test(timeout=10000) // should be greater than a fair multiple of invocationTimeoutMillis
+    public void testMethodTimeout() throws SecurityException, NoSuchMethodException {
+        ClassWithNotReturningMethod obj = new ClassWithNotReturningMethod();
+        Method method = obj.getClass().getMethod("notReturning", new Class<?>[] {String.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        classUnderTest.invocationTimeoutMillis = 100; // set to 100ms only for tests
+        
+        // invocation will run into infinity loop. timeout must stop this
+        Instruction instruction = classUnderTest.handle();
+
+        // not a result
+        assertNull(instruction);
+        
+        // the last problem was timeout
+        assertTrue(classUnderTest.timeoutHappened);
+    }
+    
     private void assertNotHasStubForMethod(Instruction instruction, final String methodName) {
         InstructionAssert.assertHasNoInstruction(instruction, new InstructionAssert.InstructionMatcher() {
 

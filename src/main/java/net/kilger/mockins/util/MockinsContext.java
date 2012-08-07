@@ -19,6 +19,9 @@ public enum MockinsContext {
 
     private ClassNamer classNamer = defaultClassNamer();
     private LocalVarNamer localVarNamer = defaultLocalVarNamer();
+    
+    /** the timeout for each invocation of the test method in milliseconds*/
+    private int invocationTimeoutMillis = 1000;
 
     /**
      * Returns the current mockhelper, autodetecting which one to use
@@ -101,6 +104,14 @@ public enum MockinsContext {
 
     private LocalVarNamer defaultLocalVarNamer() {
         return new SimpleLocalVarNamer();
+    }
+
+    public int getInvocationTimeoutMillis() {
+        return invocationTimeoutMillis;
+    }
+
+    public void setInvocationTimeoutMillis(int invocationTimeoutMillis) {
+        this.invocationTimeoutMillis = invocationTimeoutMillis;
     }
 
 }
