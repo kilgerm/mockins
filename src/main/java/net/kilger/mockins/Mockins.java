@@ -8,6 +8,8 @@ import net.kilger.mockins.instructor.InstructorFactory;
 
 /**
  * <p>Mockins is a code generator for mock and stub code.</p>
+ * <p>Please visit https://github.com/kilgerm/mockins/wiki 
+ * for full documentation.</p>
  * <p>
  * Example:
  * <pre>
