@@ -15,13 +15,16 @@ public enum MockinsContext {
 
     /** the singleton instance */ INSTANCE;
     
+
     private MockHelper mockHelper = null;
 
     private ClassNamer classNamer = defaultClassNamer();
     private LocalVarNamer localVarNamer = defaultLocalVarNamer();
     
     /** the timeout for each invocation of the test method in milliseconds*/
-    private int invocationTimeoutMillis = 1000;
+    private int invocationTimeoutMillis = DEFAULT_INVOCATION_TIMEOUT_MILLIS;
+
+    private static final int DEFAULT_INVOCATION_TIMEOUT_MILLIS = 500;
 
     /**
      * Returns the current mockhelper, autodetecting which one to use
