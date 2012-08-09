@@ -44,13 +44,18 @@ public class InstructorFactory {
     private Object[] buildConstructorArgs(Class<?>[] constructorArgTypes) {
         Object[] args = new Object[constructorArgTypes.length];
         for (int i = 0; i < constructorArgTypes.length; i++) {
-            if (constructorArgTypes[i].isPrimitive()) {
+            Class<?> type = constructorArgTypes[i];
+            if (type.isPrimitive()) {
                 // for primitive types
-                args[i] = new PrimitiveValueProviderFactory().valueProvider(constructorArgTypes[i]).createValue();
+                args[i] = createBoxedPrimitiveValue(type);
             }
             // otherwise, init value of null should do
         }
         return args;
+    }
+
+    private Object createBoxedPrimitiveValue(Class<?> type) {
+        return new PrimitiveValueProviderFactory().valueProvider(type).createValue();
     }
 
     private Constructor<?> getSuitableConstructor(Class<? extends Object> clazz) {
@@ -58,9 +63,15 @@ public class InstructorFactory {
         
         Collections.sort(declaredConstructors, CONSTRUCTOR_SORTER);
         if (declaredConstructors.size() == 0) {
-            throw new IllegalArgumentException("class " + clazz.getCanonicalName() + " has no constructor");
+            // shouldn't happen now with declaredConstructors
+            throw new IllegalArgumentException("class " + clazz.getCanonicalName() + " has no useable constructor");
         }
+        
         Constructor<?> constructor = declaredConstructors.get(0);
+        if (Modifier.isPrivate(constructor.getModifiers())) {
+            throw new IllegalArgumentException("class " + clazz.getCanonicalName() + " has no useable constructor");
+        }
+        
         return constructor;
     }
 
