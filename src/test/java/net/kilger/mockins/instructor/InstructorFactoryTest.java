@@ -6,24 +6,35 @@ import org.junit.Test;
 
 public class InstructorFactoryTest {
 
+    private static final String VALUE_ORIGINAL = "original";
+
     private static final String ACTUAL_RESULT = "RESULT";
     
     private InstructorFactory classUnderTest = new InstructorFactory();
     
     static class A {
-        public String method(String arg0) {
-            return ACTUAL_RESULT;
+        String x;
+        public A(String x) {
+            this.x = x;
+        }
+        
+        public String method() {
+            return x;
         }
     }
     
     @Test
     public void testInterceptorDelegatesToRealObject() {
-        A a = new A();
+        A obj = new A(VALUE_ORIGINAL);
+        assertEquals(VALUE_ORIGINAL, obj.x);
+        assertEquals(VALUE_ORIGINAL, obj.method());
         
-        A instructor = classUnderTest.create(a);
-
-        String result = instructor.method(null);
-        assertEquals(ACTUAL_RESULT, result);
+        A instructor = classUnderTest.create(obj);
+        
+        // instructor is a proxy, field values are dummy
+        assertEquals(null, instructor.x);
+        // but methods delegate to the real object
+        assertEquals(VALUE_ORIGINAL, instructor.method());
     }
     
     /***
@@ -58,6 +69,12 @@ public class InstructorFactoryTest {
     @Test
     public void testInterceptorClassWithPrimitiveArgConstructor() { 
         ClassWithPrimitiveArgConstructor obj = new ClassWithPrimitiveArgConstructor(null, false, ' ', 0, 0.0);
+        classUnderTest.create(obj);
+    }
+    
+    @Test
+    public void testInterceptorClassWithDefaultConstructor() { 
+        ClassWithDefaultConstructor obj = new ClassWithDefaultConstructor();
         classUnderTest.create(obj);
     }
     
