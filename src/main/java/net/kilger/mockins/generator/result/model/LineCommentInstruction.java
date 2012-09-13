@@ -13,4 +13,9 @@ public class LineCommentInstruction implements Instruction {
         return "// " + comment + "\n";
     }
 
+    @Override
+    public String toString() {
+        return message();
+    }
+
 }

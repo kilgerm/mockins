@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import net.kilger.mockins.analysis.ExceptionAnalyzer;
 import net.kilger.mockins.analysis.model.FieldInfo;
 import net.kilger.mockins.analysis.model.ParamInfo;
 import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
@@ -36,8 +37,9 @@ public class NpeHandler implements RetryCallback {
     private List<FieldInfo> fieldInfos;
 
     private Throwable latestException;
-    
-    private boolean hasNpe;
+
+    private ExceptionAnalyzer exceptionAnalyzer = MockinsContext.INSTANCE.getExceptionAnalyzer();
+
     private volatile boolean invocationCompletedWithoutError;
     boolean timeoutHappened;
     
@@ -341,7 +343,6 @@ public class NpeHandler implements RetryCallback {
             
             if (invocationCompletedWithoutError) {
                 LOG.debug("invocation completed without error");
-                hasNpe = false;
                 latestException = null;                
             }
             
@@ -352,7 +353,6 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void resetStatusFlags() {
-        hasNpe = false;
         timeoutHappened = false;
         latestException = null;
         invocationCompletedWithoutError = false;
@@ -360,6 +360,7 @@ public class NpeHandler implements RetryCallback {
 
     private Runnable methodInvokator(final Object[] currentArgs) {
         return new Runnable() {
+
             public void run() {
                 try {
                     method.invoke(classUnderTest, currentArgs);
@@ -369,7 +370,6 @@ public class NpeHandler implements RetryCallback {
                     Throwable cause = ite.getCause();
                     latestException = cause;
                     if (cause instanceof NullPointerException) {
-                        hasNpe = true;
                     }
 
                 } catch (IllegalArgumentException e) {
@@ -391,7 +391,7 @@ public class NpeHandler implements RetryCallback {
 
     public boolean isNpe() {
         // timeout needs to be treated as "potentially npe"
-        return hasNpe || timeoutHappened;
+        return exceptionAnalyzer.isNpe(latestException) || timeoutHappened;
     }
 
 }

@@ -21,6 +21,9 @@ public class CompositeInstruction implements Instruction {
     }
     
     public void addComponent(Instruction component) {
+        if (component == null) {
+            throw new IllegalArgumentException("component was null");
+        }
         components.add(component);
     }
     

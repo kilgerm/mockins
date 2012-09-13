@@ -31,4 +31,13 @@ public class CreateValueInstruction implements Instruction {
     public String toString() {
         return message();
     }
+
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public String getValueCreationCode() {
+        return valueCreationCode;
+    }
+    
 }

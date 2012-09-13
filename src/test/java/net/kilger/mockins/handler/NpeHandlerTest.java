@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.kilger.mockins.analysis.ExceptionAnalyzer;
 import net.kilger.mockins.generator.result.InstructionAssert;
 import net.kilger.mockins.generator.result.InstructionTreeWalker;
+import net.kilger.mockins.generator.result.model.CreateValueInstruction;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.StubInstruction;
 import net.kilger.mockins.util.LocalVarNamer;
@@ -17,7 +19,8 @@ import net.kilger.mockins.util.MockinsContext;
 import net.kilger.mockins.util.impl.SimpleLocalVarNamer;
 import net.kilger.mockins.util.mocking.DummyMockHelper;
 
-import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -104,10 +107,17 @@ public class NpeHandlerTest {
             System.out.println(field0.getData().toString());
         }
     }
-
-    @BeforeClass
-    public static void useDummyMockHelper() {
+    
+    @Before
+    public void setupMockinsContext() {
+        MockinsContext.INSTANCE.resetToDefault();        
         MockinsContext.INSTANCE.setMockHelper(new DummyMockHelper());
+    }
+    
+    @AfterClass
+    public static void cleanupMockinsContext() {
+        // reset, in case there have been modifications to the context
+        MockinsContext.INSTANCE.resetToDefault();
     }
     
     @Test
@@ -618,6 +628,54 @@ public class NpeHandlerTest {
         assertTrue(classUnderTest.timeoutHappened);
     }
     
+    class MyException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+        
+        Throwable cause;
+
+        public MyException(Throwable cause) {
+            this.cause = cause;
+        }
+    }
+    
+    class ClassHidingNpesInCustomException {
+        public int something(String s) {
+            int z = 0;
+            try {
+                z = s.length();
+            }
+            catch(Exception e) {
+                throw new MyException(e);
+            }
+            return z;
+        }
+    }
+    
+    @Test
+    public void testCustomException() throws SecurityException, NoSuchMethodException {
+        ClassHidingNpesInCustomException obj = new ClassHidingNpesInCustomException();
+
+        // unrwrap the custom exception to determine whether an exception is an NPE
+        MockinsContext.INSTANCE.setExceptionAnalyzer(new ExceptionAnalyzer() {
+            public boolean isNpe(Throwable exception) {
+                if (exception instanceof MyException) {
+                    return ((MyException) exception).cause instanceof NullPointerException;
+                }
+                return false;
+            }
+        });
+        Method method = obj.getClass().getMethod("something", new Class<?>[] {String.class} );
+        Object[] initialArgs = { null };
+        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        
+        Instruction instruction = classUnderTest.handle();
+        String result = instruction.toString();
+        System.err.println(result);
+        assertNotNull(instruction);
+        assertHasCreateValue(instruction, "param0", "\"\"");
+    }
+    
+    
     private void assertNotHasStubForMethod(Instruction instruction, final String methodName) {
         InstructionAssert.assertHasNoInstruction(instruction, new InstructionAssert.InstructionMatcher() {
 
@@ -641,6 +699,23 @@ public class NpeHandlerTest {
                 StubInstruction stubInstruction = (StubInstruction) instruction;
                 return mockName.equals(stubInstruction.getMockName()) && 
                        stubMethodName.equals(stubInstruction.getStubbing().getMethod().getName());
+            }
+        });
+    }
+    
+    private void assertHasCreateValue(Instruction instruction, final String paramName, final String expectedValueCode) {
+        InstructionAssert.assertHasInstruction(instruction, new InstructionAssert.InstructionMatcher() {
+            public boolean matches(Instruction instruction) {
+                if (instruction instanceof CreateValueInstruction) {
+                    CreateValueInstruction cvi = (CreateValueInstruction) instruction;
+                    if (cvi.getTargetName().equals(paramName)) {
+                        // there should be (logically) only one instruction for this targetname,
+                        // so we can compare the code directly
+                        assertEquals(cvi.getValueCreationCode(), expectedValueCode);
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }

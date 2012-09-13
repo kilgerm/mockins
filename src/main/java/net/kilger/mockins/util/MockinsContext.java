@@ -1,5 +1,7 @@
 package net.kilger.mockins.util;
 
+import net.kilger.mockins.analysis.DefaultExceptionAnalyzer;
+import net.kilger.mockins.analysis.ExceptionAnalyzer;
 import net.kilger.mockins.util.impl.SimpleClassNamer;
 import net.kilger.mockins.util.impl.SimpleLocalVarNamer;
 import net.kilger.mockins.util.mocking.MockHelper;
@@ -14,18 +16,33 @@ import net.kilger.mockins.util.mocking.impl.MockitoHelper;
 public enum MockinsContext {
 
     /** the singleton instance */ INSTANCE;
-    
 
-    private MockHelper mockHelper = null;
+    private MockHelper mockHelper;
 
-    private ClassNamer classNamer = defaultClassNamer();
-    private LocalVarNamer localVarNamer = defaultLocalVarNamer();
-    
+    private ClassNamer classNamer;
+    private LocalVarNamer localVarNamer;
+    private ExceptionAnalyzer exceptionAnalyzer;
+
     /** the timeout for each invocation of the test method in milliseconds*/
-    private int invocationTimeoutMillis = DEFAULT_INVOCATION_TIMEOUT_MILLIS;
+    private int invocationTimeoutMillis;
 
     private static final int DEFAULT_INVOCATION_TIMEOUT_MILLIS = 500;
 
+    /**
+     * Reset the Mockins context to default values.
+     */
+    public void resetToDefault() {
+        mockHelper = null;
+        classNamer = defaultClassNamer();
+        localVarNamer = defaultLocalVarNamer();
+        exceptionAnalyzer = defaultExceptionAnalyzer();
+        invocationTimeoutMillis = DEFAULT_INVOCATION_TIMEOUT_MILLIS;
+    }
+    
+    private MockinsContext() {
+        resetToDefault();
+    }
+    
     /**
      * Returns the current mockhelper, autodetecting which one to use
      * if none was explicitely configured. 
@@ -74,6 +91,18 @@ public enum MockinsContext {
                 "Consider the main documentation for supported mocking frameworks and versions.");
     }
 
+    private static ClassNamer defaultClassNamer() {
+        return new SimpleClassNamer();
+    }
+
+    private static LocalVarNamer defaultLocalVarNamer() {
+        return new SimpleLocalVarNamer();
+    }
+
+    private static ExceptionAnalyzer defaultExceptionAnalyzer() {
+        return new DefaultExceptionAnalyzer();
+    }
+    
     private static boolean isClassPresent(String qualifiedClassName) {
         boolean found;
         try {
@@ -100,14 +129,6 @@ public enum MockinsContext {
     public void setLocalVarNamer(LocalVarNamer localVarNamer) {
         INSTANCE.localVarNamer = localVarNamer;
     }
-    
-    private static ClassNamer defaultClassNamer() {
-        return new SimpleClassNamer();
-    }
-
-    private LocalVarNamer defaultLocalVarNamer() {
-        return new SimpleLocalVarNamer();
-    }
 
     public int getInvocationTimeoutMillis() {
         return invocationTimeoutMillis;
@@ -115,6 +136,14 @@ public enum MockinsContext {
 
     public void setInvocationTimeoutMillis(int invocationTimeoutMillis) {
         this.invocationTimeoutMillis = invocationTimeoutMillis;
+    }
+
+    public ExceptionAnalyzer getExceptionAnalyzer() {
+        return exceptionAnalyzer;
+    }
+
+    public void setExceptionAnalyzer(ExceptionAnalyzer exceptionAnalyzer) {
+        this.exceptionAnalyzer = exceptionAnalyzer;
     }
 
 }

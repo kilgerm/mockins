@@ -24,6 +24,9 @@ public class TestMethodGenerator {
 
             NpeHandler npeHandler = new NpeHandler(classUnderTest, method, initialArgs);
             Instruction stubMockAndCall = npeHandler.handle();
+            if (stubMockAndCall == null) {
+                throw new RuntimeException("FAIL");
+            }
 
             testMethodInstruction.addComponent(new InstantiateClassInstruction("classUnderTest", clazz));
             testMethodInstruction.addComponent(stubMockAndCall);
