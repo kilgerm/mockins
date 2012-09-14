@@ -6,7 +6,7 @@ import net.kilger.mockins.generator.result.model.DeclareTestMethodInstruction;
 import net.kilger.mockins.generator.result.model.InstantiateClassInstruction;
 import net.kilger.mockins.generator.result.model.Instruction;
 import net.kilger.mockins.generator.result.model.LineCommentInstruction;
-import net.kilger.mockins.handler.NpeHandler;
+import net.kilger.mockins.handler.InvocationHandler;
 
 /**
  * Class for generating the code skeleton for a test call to a given method.
@@ -22,7 +22,7 @@ public class TestMethodGenerator {
             
             Object[] initialArgs = getInitialArgs(method);
 
-            NpeHandler npeHandler = new NpeHandler(classUnderTest, method, initialArgs);
+            InvocationHandler npeHandler = new InvocationHandler(classUnderTest, method, initialArgs);
             Instruction stubMockAndCall = npeHandler.handle();
             if (stubMockAndCall == null) {
                 throw new RuntimeException("FAIL");

@@ -24,36 +24,22 @@ import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
 import net.kilger.mockins.util.MockinsContext;
 
 
-public class NpeHandler implements RetryCallback {
+public class InvocationHandler implements RetryCallback {
 
-    private final Object classUnderTest;
-    private final Method method;
-    private final Object[] initialArgs;
-    private int argLength;
-    
     private MockStubInstructionBuilder mockInstructionBuilder = new MockStubInstructionBuilder(); 
 
-    private List<ParamInfo> paramInfos;
-    private List<FieldInfo> fieldInfos;
-
-    private Throwable latestException;
-
     private ExceptionAnalyzer exceptionAnalyzer = MockinsContext.INSTANCE.getExceptionAnalyzer();
-
-    private volatile boolean invocationCompletedWithoutError;
-    boolean timeoutHappened;
-    
 
     /** the maximum number of levels where to stub - use with caution */
     int maxStubLevel = 2;
     
-    /** timeout for invocation of the method to test in milliseconds */
-    int invocationTimeoutMillis = MockinsContext.INSTANCE.getInvocationTimeoutMillis();
-
-    public NpeHandler(Object classUnderTest, Method method, Object[] initialArgs) {
-        this.classUnderTest = classUnderTest;
-        this.method = method;
-        this.initialArgs = initialArgs;
+    InvocationContext invocationContext = new InvocationContext();
+    private NullPointerHandler nullPointerHandler = new NullPointerHandler(invocationContext);
+    
+    public InvocationHandler(Object classUnderTest, Method method, Object[] initialArgs) {
+        this.invocationContext.setClassUnderTest(classUnderTest);
+        this.invocationContext.setMethod(method);
+        this.invocationContext.setInitialArgs(initialArgs);
     }
 
     public Instruction handle() {
@@ -66,68 +52,50 @@ public class NpeHandler implements RetryCallback {
             return null;
         }
 
-        LOG.info("fill all params and fields");
-        fillAllParams();
-        fillAllFields();
-
-        retry();
-        if (!isNpe()) {
-            LOG.info("no npe after subst params and fields");
-
-            LOG.info("removing unneccessary params and fields");
-            removeNullableParams();
-            removeNullableFields();
-            
-            return resultInstruction();
-        }
-
-        LOG.info("still npe after subst params and fields");
-
-        int stubLevel = 1;
-
-        do {
-            LOG.info("stub all level " + stubLevel);
-            createAllStubbingsForParams(stubLevel);
-            createAllStubbingsForFields(stubLevel);
-
+        nullPointerHandler.init();
+        while (true) {
+        boolean triedMore = nullPointerHandler.tryMore(this);
+            if (!triedMore) {
+                LOG.error("nothing more we can do");
+                // FIXME: nicer exit
+                // if still exception: throw latest exception
+                return throwLatestExceptionOrReturnNull();
+            }
             retry();
             if (!isNpe()) {
-                LOG.info("ok now after stubbing all");
-                verifyAllStubsReproducable();
-
-                LOG.debug("removing unneccessary params and fields");
+                LOG.info("no npe after subst params and fields");
+    
+                LOG.info("removing unneccessary params and fields");
                 removeNullableParams();
                 removeNullableFields();
-
-                LOG.debug("removing unneccessary stubs for params and fields");
+                
+                LOG.info("removing unneccessary stubbings for params and fields with mocks");
                 removeUnneccesaryStubbingsForParams();
                 removeUnneccesaryStubbingsForFields();
-
+                
                 return resultInstruction();
             }
-            
-            LOG.info("still NPE after stub of level " + stubLevel);
-            stubLevel++;
-        } while (stubLevel <= maxStubLevel);
-
+        }
         
-        // if still exception: throw latest exception
-        if (latestException != null) {
-            LOG.error("stubbed all up to level " + stubLevel + " but still exception - nothing we can do...");
+    }
+
+    private Instruction throwLatestExceptionOrReturnNull() {
+        if (invocationContext.getLatestException() != null) {
+            LOG.error("did everything we could but still exception...");
             
-            if (latestException instanceof RuntimeException) {
-                throw (RuntimeException) latestException;
+            if (invocationContext.getLatestException() instanceof RuntimeException) {
+                throw (RuntimeException) invocationContext.getLatestException();
             }
             else {
                 // if no RuntimeException, wrap it first
                 // TODO: this is questionable. but do we want "throws Throwable" as signature?
-                throw new RuntimeException(latestException);
+                throw new RuntimeException(invocationContext.getLatestException());
             }
         }
         else {
             // otherwise: log problem and return null
             
-            if (timeoutHappened) {
+            if (invocationContext.isTimeoutHappened()) {
                 LOG.error("last invokation of test method did not return before timeout");
             }
             else {
@@ -138,15 +106,15 @@ public class NpeHandler implements RetryCallback {
     }
 
     private Instruction resultInstruction() {
-        return mockInstructionBuilder.buildInstruction(fieldInfos, paramInfos, method);
+        return mockInstructionBuilder.buildInstruction(invocationContext.getFieldInfos(), invocationContext.getParamInfos(), invocationContext.getMethod());
     }
 
     private void removeUnneccesaryStubbingsForParams() {
-        removeUnnecessaryStubbingsFor(paramInfos);
+        removeUnnecessaryStubbingsFor(invocationContext.getParamInfos());
     }
     
     private void removeUnneccesaryStubbingsForFields() {
-        removeUnnecessaryStubbingsFor(fieldInfos);
+        removeUnnecessaryStubbingsFor(invocationContext.getFieldInfos());
     }
 
     private void removeUnnecessaryStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
@@ -159,19 +127,12 @@ public class NpeHandler implements RetryCallback {
         }
     }
 
-    private void verifyAllStubsReproducable() throws AssertionError {
-        retry();
-        if (isNpe()) {
-            throw new AssertionError("something went wrong");
-        }
-    }
-
-    private void createAllStubbingsForParams(int maxStubLevel) {
-        createAllStubbingsFor(paramInfos, maxStubLevel);
+    void createAllStubbingsForParams(int maxStubLevel) {
+        createAllStubbingsFor(invocationContext.getParamInfos(), maxStubLevel);
     }
     
-    private void createAllStubbingsForFields(int maxStubLevel) {
-        createAllStubbingsFor(fieldInfos, maxStubLevel);
+    void createAllStubbingsForFields(int maxStubLevel) {
+        createAllStubbingsFor(invocationContext.getFieldInfos(), maxStubLevel);
     }
 
     private void createAllStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos, int maxStubLevel) {
@@ -189,12 +150,12 @@ public class NpeHandler implements RetryCallback {
     
     private void removeNullableParams() {
         // try out, which params are actually mandatory
-        trySubstituteNullValueProvider(paramInfos);
+        trySubstituteNullValueProvider(invocationContext.getParamInfos());
     }
 
     private void removeNullableFields() {
         // try out, which fields are actually mandatory
-        trySubstituteNullValueProvider(fieldInfos);
+        trySubstituteNullValueProvider(invocationContext.getFieldInfos());
     }
 
     private void trySubstituteNullValueProvider(List<? extends SubstitutableObjectInfo> substitutables) {
@@ -228,21 +189,21 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void buildCurrentValues() {
-        for (SubstitutableObjectInfo paramInfo : paramInfos) {
+        for (SubstitutableObjectInfo paramInfo : invocationContext.getParamInfos()) {
             paramInfo.createValue();
         }
-        for (SubstitutableObjectInfo fieldInfo : fieldInfos) {
+        for (SubstitutableObjectInfo fieldInfo : invocationContext.getFieldInfos()) {
             fieldInfo.createValue();
         }
     }
 
     private void insertFields() {
-        for (FieldInfo fieldInfo : fieldInfos) {
+        for (FieldInfo fieldInfo : invocationContext.getFieldInfos()) {
             Field field = fieldInfo.getField();
             field.setAccessible(true); // ignore accessibility
             LOG.debug("setting field " + field + " to " + fieldInfo.getValueProvider().code());
             try {
-                field.set(classUnderTest, fieldInfo.getCurrentValue());
+                field.set(invocationContext.getClassUnderTest(), fieldInfo.getCurrentValue());
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
@@ -251,12 +212,12 @@ public class NpeHandler implements RetryCallback {
         }
     }
 
-    private void fillAllParams() {
-        fillAllFor(paramInfos);
+    void fillAllParams() {
+        fillAllFor(invocationContext.getParamInfos());
     }
 
-    private void fillAllFields() {
-        fillAllFor(fieldInfos);
+    void fillAllFields() {
+        fillAllFor(invocationContext.getFieldInfos());
     }
 
     private void fillAllFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
@@ -274,9 +235,9 @@ public class NpeHandler implements RetryCallback {
          * bypassing accessibility is in fact needed in case 
          * the method belongs to a superclass of the instance class.
          */
-        method.setAccessible(true);
+        invocationContext.getMethod().setAccessible(true);
 
-        argLength = initialArgs.length;
+        invocationContext.setArgLength(invocationContext.getInitialArgs().length);
         
         collectParamInfo();
         
@@ -284,22 +245,22 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void collectFieldInfo() {
-        fieldInfos = new ArrayList<FieldInfo>();
-        Class<? extends Object> clazz = classUnderTest.getClass();
+        invocationContext.setFieldInfos(new ArrayList<FieldInfo>());
+        Class<? extends Object> clazz = invocationContext.getClassUnderTest().getClass();
         
         for (Field candidateField : clazz.getDeclaredFields()) { // TODO: inherited fields! getFields() won't do either, fields might not be accessible in legacy code
             if (isInteresting(candidateField)) {
                 candidateField.setAccessible(true);
                 Object initialValue = null;
                 try {
-                    initialValue = candidateField.get(classUnderTest);
+                    initialValue = candidateField.get(invocationContext.getClassUnderTest());
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } 
                 FieldInfo fieldInfo = new FieldInfo(candidateField, initialValue); 
-                fieldInfos.add(fieldInfo);
+                invocationContext.getFieldInfos().add(fieldInfo);
             }
         }
     }
@@ -312,12 +273,12 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void collectParamInfo() {
-        Class<?>[] paramTypes = method.getParameterTypes();
+        Class<?>[] paramTypes = invocationContext.getMethod().getParameterTypes();
 
-        paramInfos = new ArrayList<ParamInfo>();
-        for (int i = 0; i < argLength; i++) {
-            ParamInfo paramInfo = new ParamInfo(i, paramTypes[i], initialArgs[i]);
-            paramInfos.add(paramInfo);
+        invocationContext.setParamInfos(new ArrayList<ParamInfo>());
+        for (int i = 0; i < invocationContext.getArgLength(); i++) {
+            ParamInfo paramInfo = new ParamInfo(i, paramTypes[i], invocationContext.getInitialArgs()[i]);
+            invocationContext.getParamInfos().add(paramInfo);
         }
     }
 
@@ -335,15 +296,15 @@ public class NpeHandler implements RetryCallback {
         
         xs.shutdown();
         try {
-            timeoutHappened = !xs.awaitTermination(invocationTimeoutMillis, TimeUnit.MILLISECONDS);
+            invocationContext.setTimeoutHappened(!xs.awaitTermination(invocationContext.getInvocationTimeoutMillis(), TimeUnit.MILLISECONDS));
 
-            if (timeoutHappened) {
+            if (invocationContext.isTimeoutHappened()) {
                 LOG.debug("timeout while method invocation - assuming non-termination");
             }
             
-            if (invocationCompletedWithoutError) {
+            if (invocationContext.isInvocationCompletedWithoutError()) {
                 LOG.debug("invocation completed without error");
-                latestException = null;                
+                invocationContext.setLatestException(null);                
             }
             
         } catch (InterruptedException e) {
@@ -353,9 +314,9 @@ public class NpeHandler implements RetryCallback {
     }
 
     private void resetStatusFlags() {
-        timeoutHappened = false;
-        latestException = null;
-        invocationCompletedWithoutError = false;
+        invocationContext.setTimeoutHappened(false);
+        invocationContext.setLatestException(null);
+        invocationContext.setInvocationCompletedWithoutError(false);
     }
 
     private Runnable methodInvokator(final Object[] currentArgs) {
@@ -363,12 +324,12 @@ public class NpeHandler implements RetryCallback {
 
             public void run() {
                 try {
-                    method.invoke(classUnderTest, currentArgs);
-                    invocationCompletedWithoutError = true;
+                    invocationContext.getMethod().invoke(invocationContext.getClassUnderTest(), currentArgs);
+                    invocationContext.setInvocationCompletedWithoutError(true);
                 }
                 catch (InvocationTargetException ite) {
                     Throwable cause = ite.getCause();
-                    latestException = cause;
+                    invocationContext.setLatestException(cause);
                     if (cause instanceof NullPointerException) {
                     }
 
@@ -382,8 +343,8 @@ public class NpeHandler implements RetryCallback {
     }
 
     private Object[] determineCurrentArgs() {
-        Object[] currentArgs = new Object[argLength];
-        for (ParamInfo paramInfo : paramInfos) {
+        Object[] currentArgs = new Object[invocationContext.getArgLength()];
+        for (ParamInfo paramInfo : invocationContext.getParamInfos()) {
             currentArgs[paramInfo.getIndex()] = paramInfo.getCurrentValue();
         }
         return currentArgs;
@@ -391,7 +352,7 @@ public class NpeHandler implements RetryCallback {
 
     public boolean isNpe() {
         // timeout needs to be treated as "potentially npe"
-        return exceptionAnalyzer.isNpe(latestException) || timeoutHappened;
+        return exceptionAnalyzer.isNpe(invocationContext.getLatestException()) || invocationContext.isTimeoutHappened();
     }
 
 }

@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class NpeHandlerTest {
+public class InvocationHandlerTest {
 
     public static class B {
         public C getData() {
@@ -126,7 +126,7 @@ public class NpeHandlerTest {
         
         Method method = A1.class.getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(a, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -141,7 +141,7 @@ public class NpeHandlerTest {
         
         Method method = A2.class.getMethod("something", new Class<?>[] {B.class, B.class} );
         Object[] initialArgs = { new B(), null };
-        NpeHandler classUnderTest = new NpeHandler(a, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -158,7 +158,7 @@ public class NpeHandlerTest {
         
         Method method = A2.class.getMethod("something", new Class<?>[] {B.class, B.class} );
         Object[] initialArgs = { null, null };
-        NpeHandler classUnderTest = new NpeHandler(a, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -175,7 +175,7 @@ public class NpeHandlerTest {
         
         Method method = A3.class.getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(a3, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a3, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -192,7 +192,7 @@ public class NpeHandlerTest {
         
         Method method = A4.class.getMethod("something", new Class<?>[] {B2.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(a4, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a4, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -228,7 +228,7 @@ public class NpeHandlerTest {
         A5 obj = new A5();
         Method method = obj.getClass().getMethod("something", new Class<?>[] {D2.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
 
@@ -264,7 +264,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {D2b.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();
@@ -306,7 +306,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -322,7 +322,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -342,7 +342,7 @@ public class NpeHandlerTest {
         
         Method method = a.getClass().getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(a, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a, method, initialArgs);
         
         Instruction handle = classUnderTest.handle();
         String result = handle.toString();
@@ -365,7 +365,7 @@ public class NpeHandlerTest {
         
         Method method = a.getClass().getMethod("something", new Class<?>[] {B.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(a, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(a, method, initialArgs);
         
         Instruction handle = classUnderTest.handle();
         String result = handle.toString();
@@ -385,7 +385,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {} );
         Object[] initialArgs = { };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         String result = classUnderTest.handle().toString();
         System.err.println(result);
@@ -411,7 +411,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {} );
         Object[] initialArgs = { };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();
@@ -463,7 +463,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {B4.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();
@@ -489,7 +489,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {B4.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();
@@ -530,7 +530,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {B5.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();
@@ -579,7 +579,7 @@ public class NpeHandlerTest {
         
         Method method = obj.getClass().getMethod("something", new Class<?>[] {A10a.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         try {
             classUnderTest.maxStubLevel = 1;
@@ -615,8 +615,8 @@ public class NpeHandlerTest {
         ClassWithNotReturningMethod obj = new ClassWithNotReturningMethod();
         Method method = obj.getClass().getMethod("notReturning", new Class<?>[] {String.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
-        classUnderTest.invocationTimeoutMillis = 100; // set to 100ms only for tests
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
+        classUnderTest.invocationContext.setInvocationTimeoutMillis(100); // set to 100ms only for tests
         
         // invocation will run into infinity loop. timeout must stop this
         Instruction instruction = classUnderTest.handle();
@@ -625,7 +625,7 @@ public class NpeHandlerTest {
         assertNull(instruction);
         
         // the last problem was timeout
-        assertTrue(classUnderTest.timeoutHappened);
+        assertTrue(classUnderTest.invocationContext.isTimeoutHappened());
     }
     
     class MyException extends RuntimeException {
@@ -666,7 +666,7 @@ public class NpeHandlerTest {
         });
         Method method = obj.getClass().getMethod("something", new Class<?>[] {String.class} );
         Object[] initialArgs = { null };
-        NpeHandler classUnderTest = new NpeHandler(obj, method, initialArgs);
+        InvocationHandler classUnderTest = new InvocationHandler(obj, method, initialArgs);
         
         Instruction instruction = classUnderTest.handle();
         String result = instruction.toString();

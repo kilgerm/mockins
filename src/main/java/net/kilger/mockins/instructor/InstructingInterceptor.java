@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 
 import net.kilger.mockins.common.MockinsResultPrinter;
 import net.kilger.mockins.generator.result.model.Instruction;
-import net.kilger.mockins.handler.NpeHandler;
+import net.kilger.mockins.handler.InvocationHandler;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -45,7 +45,7 @@ public class InstructingInterceptor<T> extends MockinsResultPrinter implements M
     }
 
     private void handleNpe(Method method, Object[] args, NullPointerException originalNpe) {
-        NpeHandler npeHandler = new NpeHandler(originalObject, method, args);
+        InvocationHandler npeHandler = new InvocationHandler(originalObject, method, args);
         Instruction instructions = npeHandler.handle();
         printResults(instructions);
         
