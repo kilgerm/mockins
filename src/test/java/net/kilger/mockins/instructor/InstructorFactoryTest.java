@@ -8,8 +8,6 @@ public class InstructorFactoryTest {
 
     private static final String VALUE_ORIGINAL = "original";
 
-    private static final String ACTUAL_RESULT = "RESULT";
-    
     private InstructorFactory classUnderTest = new InstructorFactory();
     
     static class A {

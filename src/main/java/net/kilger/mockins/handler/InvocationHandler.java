@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -17,10 +16,6 @@ import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
 import net.kilger.mockins.common.LOG;
 import net.kilger.mockins.generator.MockStubInstructionBuilder;
 import net.kilger.mockins.generator.result.model.Instruction;
-import net.kilger.mockins.generator.valueprovider.ValueProvider;
-import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
-import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
-import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
 import net.kilger.mockins.util.MockinsContext;
 
 
@@ -34,7 +29,7 @@ public class InvocationHandler implements RetryCallback {
     int maxStubLevel = 2;
     
     InvocationContext invocationContext = new InvocationContext();
-    private NullPointerHandler nullPointerHandler = new NullPointerHandler(invocationContext);
+    private TestExceptionHandler nullPointerHandler;
     
     public InvocationHandler(Object classUnderTest, Method method, Object[] initialArgs) {
         this.invocationContext.setClassUnderTest(classUnderTest);
@@ -52,9 +47,12 @@ public class InvocationHandler implements RetryCallback {
             return null;
         }
 
-        nullPointerHandler.init();
+        // initialize handlers
+        nullPointerHandler = new NullPointerHandler(invocationContext, this, maxStubLevel);
+        
+        // loop
         while (true) {
-        boolean triedMore = nullPointerHandler.tryMore(this);
+        boolean triedMore = nullPointerHandler.tryToHandle();
             if (!triedMore) {
                 LOG.error("nothing more we can do");
                 // FIXME: nicer exit
@@ -65,13 +63,7 @@ public class InvocationHandler implements RetryCallback {
             if (!isNpe()) {
                 LOG.info("no npe after subst params and fields");
     
-                LOG.info("removing unneccessary params and fields");
-                removeNullableParams();
-                removeNullableFields();
-                
-                LOG.info("removing unneccessary stubbings for params and fields with mocks");
-                removeUnneccesaryStubbingsForParams();
-                removeUnneccesaryStubbingsForFields();
+                nullPointerHandler.shrink();
                 
                 return resultInstruction();
             }
@@ -109,78 +101,6 @@ public class InvocationHandler implements RetryCallback {
         return mockInstructionBuilder.buildInstruction(invocationContext.getFieldInfos(), invocationContext.getParamInfos(), invocationContext.getMethod());
     }
 
-    private void removeUnneccesaryStubbingsForParams() {
-        removeUnnecessaryStubbingsFor(invocationContext.getParamInfos());
-    }
-    
-    private void removeUnneccesaryStubbingsForFields() {
-        removeUnnecessaryStubbingsFor(invocationContext.getFieldInfos());
-    }
-
-    private void removeUnnecessaryStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
-        for (SubstitutableObjectInfo substitutableObjectInfo : substitutableObjectInfos) {
-            if (substitutableObjectInfo.getValueProvider() instanceof MockValueProvider) {
-                MockValueProvider mvp = (MockValueProvider) substitutableObjectInfo.getValueProvider();
-                mvp.removeUneccesaryStubbings(this);
-            }
-            
-        }
-    }
-
-    void createAllStubbingsForParams(int maxStubLevel) {
-        createAllStubbingsFor(invocationContext.getParamInfos(), maxStubLevel);
-    }
-    
-    void createAllStubbingsForFields(int maxStubLevel) {
-        createAllStubbingsFor(invocationContext.getFieldInfos(), maxStubLevel);
-    }
-
-    private void createAllStubbingsFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos, int maxStubLevel) {
-        for (SubstitutableObjectInfo substitutable : substitutableObjectInfos) {
-
-            if (substitutable.getValueProvider() instanceof MockValueProvider) {
-                MockValueProvider vp = (MockValueProvider) substitutable.getValueProvider();
-                vp.addAllStubs(maxStubLevel);
-                
-            } else {
-                LOG.debug(substitutable.getDisplayName() + " skip " + substitutable.getCurrentValue());
-            }
-        }
-    }
-    
-    private void removeNullableParams() {
-        // try out, which params are actually mandatory
-        trySubstituteNullValueProvider(invocationContext.getParamInfos());
-    }
-
-    private void removeNullableFields() {
-        // try out, which fields are actually mandatory
-        trySubstituteNullValueProvider(invocationContext.getFieldInfos());
-    }
-
-    private void trySubstituteNullValueProvider(List<? extends SubstitutableObjectInfo> substitutables) {
-        for (SubstitutableObjectInfo substitutable : substitutables) {
-            String displayName = substitutable.getDisplayName();
-            if (substitutable.wasInitiallyGiven()) {
-                LOG.debug("not touching: " + displayName);
-                continue;
-            }
-            ValueProvider<?> originalVp = substitutable.getValueProvider();
-            ValueProvider<Object> nullVp = new NullValueProvider();
-            substitutable.setValueProvider(nullVp);
-            
-            retry();
-            
-            if (isNpe()) {
-                LOG.debug(displayName + ": may not be null");
-                substitutable.setValueProvider(originalVp);
-            }
-            else {
-                LOG.debug(displayName + ": may be null");
-            }
-        }
-    }
-    
     public Result retry() {
         buildCurrentValues();
         insertFields();
@@ -212,24 +132,6 @@ public class InvocationHandler implements RetryCallback {
         }
     }
 
-    void fillAllParams() {
-        fillAllFor(invocationContext.getParamInfos());
-    }
-
-    void fillAllFields() {
-        fillAllFor(invocationContext.getFieldInfos());
-    }
-
-    private void fillAllFor(List<? extends SubstitutableObjectInfo> substitutableObjectInfos) {
-        for (SubstitutableObjectInfo soi : substitutableObjectInfos) {
-            if (!soi.wasInitiallyGiven()) {
-                LOG.debug("substitute null " + soi.getDisplayName());
-                ValueProvider<?> vp = ValueProviderRegistry.providerFor(soi.getType());
-                soi.setValueProvider(vp);
-            }
-        }
-    }
-    
     private void init() {
         /* 
          * bypassing accessibility is in fact needed in case 
