@@ -16,6 +16,7 @@ import net.kilger.mockins.analysis.model.SubstitutableObjectInfo;
 import net.kilger.mockins.common.LOG;
 import net.kilger.mockins.generator.MockStubInstructionBuilder;
 import net.kilger.mockins.generator.result.model.Instruction;
+import net.kilger.mockins.handler.npe.NullPointerHandler;
 import net.kilger.mockins.util.MockinsContext;
 
 
@@ -48,11 +49,11 @@ public class InvocationHandler implements RetryCallback {
         }
 
         // initialize handlers
-        nullPointerHandler = new NullPointerHandler(invocationContext, this, maxStubLevel);
+        initHandlers();
         
         // loop
         while (true) {
-        boolean triedMore = nullPointerHandler.tryToHandle();
+            boolean triedMore = nullPointerHandler.tryToHandle();
             if (!triedMore) {
                 LOG.error("nothing more we can do");
                 // FIXME: nicer exit
@@ -62,13 +63,17 @@ public class InvocationHandler implements RetryCallback {
             retry();
             if (!isNpe()) {
                 LOG.info("no npe after subst params and fields");
-    
+
                 nullPointerHandler.shrink();
-                
+
                 return resultInstruction();
             }
         }
         
+    }
+
+    private void initHandlers() {
+        nullPointerHandler = new NullPointerHandler(invocationContext, this, maxStubLevel);
     }
 
     private Instruction throwLatestExceptionOrReturnNull() {

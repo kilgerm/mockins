@@ -1,4 +1,4 @@
-package net.kilger.mockins.handler;
+package net.kilger.mockins.handler.npe;
 
 import java.util.List;
 
@@ -8,53 +8,71 @@ import net.kilger.mockins.generator.valueprovider.ValueProvider;
 import net.kilger.mockins.generator.valueprovider.ValueProviderRegistry;
 import net.kilger.mockins.generator.valueprovider.impl.MockValueProvider;
 import net.kilger.mockins.generator.valueprovider.impl.NullValueProvider;
+import net.kilger.mockins.handler.InvocationContext;
+import net.kilger.mockins.handler.RetryCallback;
 import net.kilger.mockins.handler.RetryCallback.Result;
+import net.kilger.mockins.handler.TestExceptionHandler;
 
 public class NullPointerHandler implements TestExceptionHandler {
 
-    private static final int LEVEL_STUB  = 2;
-    private static final int LEVEL_FILLED_FIELDS_AND_PARAMS = 1;
-    private static final int LEVEL_INIT = 0;
+    private interface NpeStep {
+        NpeStep proceed();
+    }
     
-    private int triedLevel = LEVEL_INIT;
+    private class NpeStepFillParamsAndFields implements NpeStep {
+
+        public NpeStep proceed() {
+            fillAllParams();
+            fillAllFields();
+            return new NpeStepAddStubs();
+        }
+    }
+    
+    private class NpeStepAddStubs implements NpeStep {
+
+        public NpeStep proceed() {
+            if (stubLevel <= maxStubLevel) {
+                LOG.info("stub all level " + stubLevel);
+                createAllStubbingsForParams(stubLevel);
+                createAllStubbingsForFields(stubLevel);
+                stubLevel++;
+            }
+            if (stubLevel <= maxStubLevel) {
+                return this;
+            }
+            else {
+                return null;
+            }
+        }
+    }
+    
     private int stubLevel;
     
     private InvocationContext invocationContext;
     private RetryCallback retryCallback;
     private int maxStubLevel;
+    private NpeStep currentStep;
     
     public NullPointerHandler(InvocationContext invocationContext, RetryCallback retryCallback, int maxStubLevel) {
-        this.triedLevel = NullPointerHandler.LEVEL_INIT;
         this.maxStubLevel = maxStubLevel;
         this.retryCallback = retryCallback;
         this.invocationContext = invocationContext;
+        this.currentStep = initialStep();
+    }
+
+    private NpeStepFillParamsAndFields initialStep() {
+        return new NpeStepFillParamsAndFields();
     }
 
     public boolean tryToHandle() {
         
-        if (triedLevel  == NullPointerHandler.LEVEL_INIT) {
-            fillAllParams();
-            fillAllFields();
-            triedLevel = NullPointerHandler.LEVEL_FILLED_FIELDS_AND_PARAMS;
+        if (currentStep != null) {
+            currentStep = currentStep.proceed();
             return true;
         }
-        
-        if (triedLevel == NullPointerHandler.LEVEL_FILLED_FIELDS_AND_PARAMS) {
-            stubLevel = 1;
-            triedLevel = NullPointerHandler.LEVEL_STUB;
-            // run to next step
+        else {
+            return false;
         }
-            
-        if (triedLevel == NullPointerHandler.LEVEL_STUB && stubLevel <= maxStubLevel) {
-            LOG.info("stub all level " + stubLevel);
-            createAllStubbingsForParams(stubLevel);
-            createAllStubbingsForFields(stubLevel);
-            stubLevel++;
-            return true;
-        }
-        
-        // nothing more to do
-        return false;
     }
 
     public void shrink() {
